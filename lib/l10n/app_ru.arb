@@ -1,0 +1,452 @@
+{
+  "@@locale": "ru",
+
+  "appName": "DearMe",
+  "appTagline": "Письма себе в будущее",
+  "appDescription": "Тихое место, где можно оставить несколько слов тому, кем ты станешь.",
+
+  "settingsTitle": "Настройки",
+  "cancel": "Отмена",
+  "disable": "Отключить",
+  "save": "Сохранить",
+  "delete": "Удалить",
+  "close": "Закрыть",
+  "back": "Назад",
+  "done": "Готово",
+  "edit": "Изменить",
+  "open": "Открыть",
+  "retry": "Повторить",
+  "confirm": "Подтвердить",
+  "dismiss": "Закрыть",
+  "ok": "Хорошо",
+  "refresh": "Обновить",
+  "loading": "Загружаем…",
+  "unexpectedError": "Что-то пошло не так. Попробуй ещё раз.",
+  "storageError": "Не удалось загрузить письма.",
+  "storageWriteError": "Не удалось сохранить изменения.",
+  "storageUnavailableBanner": "Хранилище недоступно: письма сохранятся только до перезапуска приложения.",
+  "settingsSaveError": "Не удалось сохранить настройку.",
+  "loadErrorTitle": "Не получилось загрузить письма",
+  "tryAgain": "Попробовать снова",
+  "offlineOrPermission": "Проверь свободное место и разрешения приложения.",
+
+  "homeGreetingMorning": "Доброе утро",
+  "homeGreetingAfternoon": "Добрый день",
+  "homeGreetingEvening": "Добрый вечер",
+  "homeGreetingNight": "Тихой ночи",
+  "homeHello": "С возвращением.",
+  "homeSubtitleEmpty": "Напиши первое письмо себе в будущее.",
+  "homeSummary": "{count, plural, =0 {Пока ни одного письма. Самое время начать.} one {Одно письмо ждёт своего часа.} few {{count} письма ждут своего часа.} many {{count} писем ждут своего часа.} other {{count} письма ждут своего часа.}}",
+  "@homeSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSummaryAllRead": "Все письма прочитаны. Можно написать новое — будущему себе.",
+  "homeNewLetter": "Написать письмо",
+  "homeReadySection": "Можно открыть",
+  "homeSealedSection": "Запечатано",
+  "homeOpenedSection": "Прочитано",
+  "homeDraftsSection": "Черновики",
+  "homeFooterQuote": "Некоторые слова лучше прочитать позже.",
+  "emptyTitle": "Пока здесь тихо",
+  "emptyBody": "Твоё первое письмо уже ждёт, чтобы его написали. Выбери день — и оставь будущему себе несколько слов.",
+  "emptyAction": "Написать первое письмо",
+  "emptyDraftsTitle": "Здесь появятся черновики",
+  "emptyDraftsBody": "Начни письмо — и оно сохранится автоматически.",
+  "statSealed": "Запечатано",
+  "statReady": "Готовы",
+  "statOpened": "Прочитано",
+  "statDrafts": "Черновики",
+
+  "statusSealed": "Запечатано",
+  "statusReady": "Готово к открытию",
+  "statusOpened": "Прочитано",
+  "statusDraft": "Черновик",
+  "createdOn": "Создано {date}",
+  "@createdOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "opensOn": "Откроется {date}",
+  "@opensOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "openedOn": "Открыто {date}",
+  "@openedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "opensIn": "До открытия",
+  "opensNow": "Можно открыть сейчас",
+  "letterCount": "{count, plural, one {{count} письмо} few {{count} письма} many {{count} писем} other {{count} письма}}",
+  "@letterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "countdownLessThanMinute": "меньше минуты",
+  "countdownDays": "{count, plural, one {{count} день} few {{count} дня} many {{count} дней} other {{count} дня}}",
+  "@countdownDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownHours": "{count, plural, one {{count} час} few {{count} часа} many {{count} часов} other {{count} часа}}",
+  "@countdownHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownMinutes": "{count, plural, one {{count} минута} few {{count} минуты} many {{count} минут} other {{count} минуты}}",
+  "@countdownMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownSeconds": "{count, plural, one {{count} секунда} few {{count} секунды} many {{count} секунд} other {{count} секунды}}",
+  "@countdownSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "editorNewTitle": "Новое письмо",
+  "editorEditTitle": "Редактировать письмо",
+  "editorTitleLabel": "Заголовок",
+  "editorTitleHint": "О чём это письмо?",
+  "editorBodyLabel": "Письмо",
+  "editorBodyHint": "Дорогой я в будущем…",
+  "editorOpenAt": "Когда открыть",
+  "editorOpenDate": "Дата открытия",
+  "editorOpenTime": "Время",
+  "editorChooseDate": "Выбрать дату",
+  "editorChooseTime": "Выбрать время",
+  "editorOpenAtHelper": "Письмо будет запечатано до этого момента.",
+  "editorTitleRequired": "Введите заголовок.",
+  "editorTitleTooLong": "Заголовок слишком длинный: максимум {max} символов.",
+  "@editorTitleTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editorBodyRequired": "Напишите хотя бы несколько слов.",
+  "editorBodyTooLong": "Письмо слишком длинное: максимум {max} символов.",
+  "@editorBodyTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editorOpenAtRequired": "Выберите дату и время открытия.",
+  "editorOpenAtFuture": "Дата открытия должна быть в будущем.",
+  "charCount": "{count} / {max}",
+  "@charCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "autosaved": "Черновик сохранён",
+  "autosaveFailed": "Не удалось сохранить черновик.",
+  "savedAt": "Сохранено в {time}",
+  "@savedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "discardTitle": "Отменить изменения?",
+  "discardBody": "Несохранённые изменения будут потеряны.",
+  "discardAction": "Выйти без сохранения",
+  "keepEditing": "Продолжить редактирование",
+  "saveDraft": "Сохранить черновик",
+  "sealLetter": "Запечатать письмо",
+  "saveChanges": "Сохранить изменения",
+  "saveConfirmTitle": "Запечатать письмо?",
+  "saveConfirmBody": "Письмо будет запечатано до {date}.",
+  "@saveConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "saveConfirmAction": "Запечатать",
+  "sealedSuccess": "Письмо запечатано. Увидимся в будущем.",
+  "draftSaved": "Черновик сохранён.",
+  "letterUpdated": "Письмо обновлено.",
+  "editingSealedNotice": "Письмо уже запечатано. Изменения перепланируют уведомление, но содержимое всё равно откроется только в назначенный момент.",
+  "draftNotice": "Это черновик. Выбери дату и запечатай письмо, когда будешь готов.",
+  "datePickerHelp": "Выберите день открытия",
+  "timePickerHelp": "Выберите время открытия",
+  "invalidDate": "Некорректная дата.",
+  "draftAutosaveHint": "Автосохранение включено",
+
+  "detailSealedTitle": "Запечатанное письмо",
+  "detailSealedBody": "Ты написал его {createdDate}.\nОно откроется {openDate}.",
+  "@detailSealedBody": {
+    "placeholders": {
+      "createdDate": {
+        "type": "String"
+      },
+      "openDate": {
+        "type": "String"
+      }
+    }
+  },
+  "detailReadyTitle": "Письмо готово",
+  "detailReadyBody": "Ты написал его {createdDate}.\nПора прочитать.",
+  "@detailReadyBody": {
+    "placeholders": {
+      "createdDate": {
+        "type": "String"
+      }
+    }
+  },
+  "detailOpenButton": "Открыть письмо",
+  "detailLockedHint": "Содержимое надёжно спрятано до назначенного дня.",
+  "detailOpenedAt": "Открыто {date}",
+  "@detailOpenedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailWrittenAt": "Написано {date}",
+  "@detailWrittenAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailDeleteTitle": "Удалить письмо?",
+  "detailDeleteBody": "«{title}» будет удалено навсегда. Это действие нельзя отменить.",
+  "@detailDeleteBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "detailDeleted": "Письмо удалено.",
+  "detailNotFound": "Письмо не найдено",
+  "detailNotFoundBody": "Возможно, оно было удалено или ссылка устарела.",
+  "detailBackHome": "На главную",
+  "detailEdit": "Редактировать",
+  "detailReschedule": "Изменить дату",
+  "detailDelete": "Удалить",
+  "rescheduleTitle": "Когда открыть письмо?",
+  "rescheduleSuccess": "Дата открытия обновлена.",
+  "sealedEditNotAllowed": "Запечатанное письмо нельзя редактировать. Можно изменить только дату открытия.",
+  "detailSealedBadge": "До открытия",
+  "sealStamp": "ЗАПЕЧАТАНО",
+  "wordCount": "{count, plural, one {{count} слово} few {{count} слова} many {{count} слов} other {{count} слова}}",
+  "@wordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "detailLetterFromPast": "Письмо из прошлого",
+
+  "settingsAppearance": "Оформление",
+  "settingsTheme": "Тема",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+  "themeOled": "OLED",
+  "themeLightDescription": "Тёплая бумага и мягкие тени.",
+  "themeDarkDescription": "Спокойные тёмные поверхности.",
+  "themeOledDescription": "Чистый чёрный и высокий контраст.",
+  "settingsLanguage": "Язык",
+  "languageRu": "Русский",
+  "languageEn": "English",
+  "settingsNotifications": "Уведомления",
+  "settingsNotificationsEnabled": "Напоминать об открытии",
+  "settingsNotificationsDescription": "Системное уведомление придёт, когда письмо будет готово.",
+  "notificationPermissionStatus": "Разрешение",
+  "permissionGranted": "Разрешено",
+  "permissionDenied": "Запрещено",
+  "permissionNotDetermined": "Ещё не запрошено",
+  "permissionUnsupported": "Не поддерживается на этом устройстве",
+  "requestPermission": "Запросить разрешение",
+  "testNotification": "Проверить уведомление",
+  "testNotificationSent": "Тестовое уведомление отправлено.",
+  "testNotificationFailed": "Не удалось показать уведомление. Проверь разрешение браузера или системы.",
+  "testNotificationNeedsPermission": "Сначала разреши уведомления.",
+  "openSystemSettings": "Открыть настройки системы",
+  "systemSettingsUnavailable": "Системные настройки уведомлений недоступны на этой платформе.",
+  "notificationLimitationsTitle": "Возможности платформы",
+  "notificationLimitationsLinux": "Linux не предоставляет системный планировщик локальных уведомлений. Уведомления придут, пока DearMe запущено; само уведомление при этом системное.",
+  "notificationLimitationsIos": "iOS хранит не более 64 ожидающих уведомлений. DearMe планирует ближайшие 60, остальные добавит при следующем запуске.",
+  "notificationLimitationsAndroid": "Android может задерживать фоновую доставку и требовать отключения оптимизации батареи для точного времени.",
+  "notificationLimitationsWeb": "Уведомления при закрытой вкладке требуют HTTPS, разрешения браузера и настроенного push-сервера. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.",
+  "notificationLimitationsWindows": "Windows доставляет запланированные уведомления. Без MSIX-пакета приложение не может убрать уже показанное уведомление из центра, но отмена запланированного работает.",
+  "notificationLimitationsMacos": "macOS использует системные уведомления. Разрешение можно изменить в Системных настройках.",
+  "notificationLimitationsNone": "Платформа поддерживает системные уведомления.",
+  "notificationLimitationsWebUnsupported": "Этот браузер не поддерживает Web Push или Service Worker, поэтому фоновые уведомления недоступны.",
+  "pushServerStatus": "Push-сервер",
+  "pushServerConnected": "Подключён",
+  "pushServerNotConfigured": "Не настроен",
+  "pushServerError": "Нет связи",
+  "pushServerNotConfiguredHint": "Укажи адрес сервера при сборке: --dart-define=DEARME_PUSH_API=https://…",
+  "notificationDisableConfirmTitle": "Отключить уведомления?",
+  "notificationDisableConfirmBody": "Запланированные напоминания будут отменены. Письма останутся запечатанными и откроются в назначенное время.",
+  "settingsData": "Данные",
+  "dataLetters": "Писем",
+  "dataOpened": "Открыто",
+  "dataSealed": "Запечатано",
+  "dataDrafts": "Черновиков",
+  "exportData": "Экспортировать письма",
+  "exportDescription": "Сохранить резервную копию в JSON.",
+  "importData": "Импортировать письма",
+  "importDescription": "Добавить письма из файла экспорта.",
+  "deleteAllData": "Удалить все данные",
+  "deleteAllDescription": "Все письма и настройки будут удалены.",
+  "deleteAllTitle": "Удалить всё?",
+  "deleteAllBody": "Все письма будут удалены навсегда. Это действие нельзя отменить.",
+  "deleteAllConfirmHint": "Введите {word}, чтобы подтвердить.",
+  "@deleteAllConfirmHint": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAllConfirmWord": "УДАЛИТЬ",
+  "deleteAllAction": "Удалить всё",
+  "dataDeleted": "Все данные удалены.",
+  "exportSuccess": "Резервная копия сохранена.",
+  "exportFailed": "Не удалось экспортировать письма.",
+  "importSuccess": "Импорт завершён.",
+  "importResult": "Добавлено: {imported}, обновлено: {updated}, пропущено: {skipped}.",
+  "@importResult": {
+    "placeholders": {
+      "imported": {
+        "type": "int"
+      },
+      "updated": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailed": "Не удалось импортировать письма.",
+  "importInvalid": "Файл не похож на резервную копию DearMe.",
+  "importEmpty": "В этом файле нет писем.",
+  "importConfirmTitle": "Импортировать письма?",
+  "importConfirmBody": "Найдено писем: {count}. Письма с теми же идентификаторами обновятся, если импортированная версия новее.",
+  "@importConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importConfirmAction": "Импортировать",
+  "settingsAbout": "О приложении",
+  "aboutVersion": "Версия {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDescription": "DearMe — спокойное место для писем самому себе. Напиши сегодня, прочитай, когда придёт время.",
+  "aboutLicenses": "Лицензии с открытым исходным кодом",
+  "aboutPrivacy": "Приватность",
+  "aboutPrivacyBody": "Письма хранятся только на этом устройстве. На push-сервер передаются лишь идентификатор письма, время доставки и технические данные подписки — без текста письма.",
+  "aboutMadeWith": "Сделано с заботой о будущем.",
+  "licensePageTitle": "Лицензии",
+
+  "notificationTitle": "Твоё письмо из прошлого 💌",
+  "notificationBody": "Письмо, которое ты написал себе, готово к открытию.",
+  "notificationChannelName": "Письма DearMe",
+  "notificationChannelDescription": "Напоминания об открытии писем",
+  "testNotificationTitle": "DearMe на связи",
+  "testNotificationBody": "Уведомления настроены. Письма из прошлого найдут тебя.",
+
+  "errorNotificationSchedule": "Письмо сохранено, но уведомление запланировать не удалось.",
+  "errorNotificationPermission": "Разрешение на уведомления не получено.",
+  "errorNotificationUnsupported": "Уведомления недоступны на этой платформе.",
+  "errorImportRead": "Не удалось прочитать выбранный файл.",
+  "errorImportParse": "Файл повреждён или имеет неверный формат.",
+  "errorNoLettersToExport": "Пока нечего экспортировать.",
+
+  "a11yOpenSettings": "Открыть настройки",
+  "a11yNewLetter": "Создать новое письмо",
+  "a11yLetterCard": "Письмо «{title}», {status}",
+  "@a11yLetterCard": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yBack": "Назад",
+  "a11yMore": "Ещё",
+  "a11yThemeSelected": "Выбрана тема {theme}",
+  "@a11yThemeSelected": {
+    "placeholders": {
+      "theme": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yLanguageSelected": "Выбран язык {language}",
+  "@a11yLanguageSelected": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+
+  "weekdayShortMon": "Пн",
+  "weekdayShortTue": "Вт",
+  "weekdayShortWed": "Ср",
+  "weekdayShortThu": "Чт",
+  "weekdayShortFri": "Пт",
+  "weekdayShortSat": "Сб",
+  "weekdayShortSun": "Вс"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "DearMe — Letters to your future self",
+  "short_name": "DearMe",
+  "description": "A quiet place for letters to your future self. Write today, read when the time comes.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#14110E",
+  "theme_color": "#14110E",
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "categories": ["lifestyle", "productivity"],
+  "lang": "ru",
+  "dir": "auto",
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

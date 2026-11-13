@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="DearMe — a quiet place for letters to your future self. Write today, read when the time comes.">
+  <meta name="theme-color" content="#14110E">
+  <meta name="color-scheme" content="dark light">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- iOS PWA and Web Push metadata. On iOS 16.4+ Web Push requires the site
+       to be added to the Home Screen. -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DearMe">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <title>DearMe — Letters to your future self</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #14110E;
+      color: #F0E9DF;
+    }
+    #splash {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(232, 184, 109, 0.12), transparent 55%),
+        linear-gradient(135deg, #1B1611, #12100D 60%, #0C0A08);
+      z-index: 9999;
+      transition: opacity 220ms ease;
+    }
+    #splash .inner {
+      text-align: center;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+    #splash .mark {
+      width: 64px;
+      height: 48px;
+      margin: 0 auto 18px;
+      border: 2px solid #E7BD7C;
+      border-radius: 8px;
+      position: relative;
+      opacity: 0.9;
+    }
+    #splash .mark::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 4px;
+      height: 26px;
+      border-bottom: 2px solid #E7BD7C;
+      transform: skewY(0deg);
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      background: transparent;
+    }
+    #splash h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #F5EDE2;
+    }
+    #splash p {
+      margin: 8px 0 0;
+      color: #B9AB97;
+      font-size: 13px;
+      letter-spacing: 0.4px;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #splash .mark { animation: breathe 2.4s ease-in-out infinite; }
+      @keyframes breathe {
+        0%, 100% { transform: translateY(0); opacity: 0.9; }
+        50% { transform: translateY(-3px); opacity: 1; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="splash" aria-hidden="true">
+    <div class="inner">
+      <div class="mark"></div>
+      <h1>DearMe</h1>
+      <p>Letters to your future self</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var removed = false;
+      function hideSplash() {
+        if (removed) return;
+        removed = true;
+        var splash = document.getElementById('splash');
+        if (!splash) return;
+        splash.style.opacity = '0';
+        setTimeout(function () { splash.remove(); }, 240);
+      }
+      window.addEventListener('flutter-first-frame', hideSplash);
+      // Defensive fallback for environments where the event is not delivered
+      // (older engines or a browser that paints without dispatching it).
+      setTimeout(hideSplash, 8000);
+    })();
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
