@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/models/app_font_option.dart';
 import '../../../core/models/app_locale_option.dart';
 import '../../../core/models/app_settings.dart';
 import '../../../core/models/app_theme_option.dart';
@@ -21,6 +22,7 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
 
   static const String _themeKey = 'settings.theme';
   static const String _localeKey = 'settings.locale';
+  static const String _fontKey = 'settings.font';
   static const String _notificationsKey = 'settings.notificationsEnabled';
   static const String _permissionRequestedKey =
       'settings.notificationPermissionRequested';
@@ -37,6 +39,7 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
       return AppSettings(
         theme: AppThemeOption.fromStorage(_preferences.getString(_themeKey)),
         locale: AppLocaleOption.fromStorage(_preferences.getString(_localeKey)),
+        font: AppFontOption.fromStorage(_preferences.getString(_fontKey)),
         notificationsEnabled: _preferences.getBool(_notificationsKey) ?? true,
         lastKnownTimeZone: _preferences.getString(_timeZoneKey),
         notificationPermissionRequested:
@@ -52,6 +55,7 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
     final results = await Future.wait<bool>([
       _preferences.setString(_themeKey, settings.theme.storageKey),
       _preferences.setString(_localeKey, settings.locale.languageCode),
+      _preferences.setString(_fontKey, settings.font.storageKey),
       _preferences.setBool(_notificationsKey, settings.notificationsEnabled),
       _preferences.setBool(
         _permissionRequestedKey,
@@ -73,6 +77,7 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
     await Future.wait<bool>([
       _preferences.remove(_themeKey),
       _preferences.remove(_localeKey),
+      _preferences.remove(_fontKey),
       _preferences.remove(_notificationsKey),
       _preferences.remove(_permissionRequestedKey),
       _preferences.remove(_timeZoneKey),

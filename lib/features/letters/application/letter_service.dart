@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 
@@ -164,6 +165,14 @@ class LetterService {
           )
           .toList();
 
+      developer.log(
+        'Synchronizing ${future.length} notification(s) '
+        '(enabled: ${settings.notificationsEnabled}, '
+        'locale: ${settings.locale.languageCode}, platform: '
+        '${_notifications.platformInfo.platformName}).',
+        name: 'dearme.notifications',
+      );
+
       if (!settings.notificationsEnabled || future.isEmpty) {
         await _notifications.cancelAllScheduled();
         return null;
@@ -171,8 +180,17 @@ class LetterService {
 
       final permission = await _notifications.permissionStatus();
       if (!permission.isGranted) {
+        developer.log(
+          'Notification permission is ${permission.name}; cancelling the '
+          'pending schedule without touching letters.',
+          name: 'dearme.notifications',
+        );
         await _notifications.cancelAllScheduled();
-        return null;
+        return NotificationPermissionException(
+          null,
+          'Permission status: ${permission.name}, '
+          'platform: ${_notifications.platformInfo.platformName}.',
+        );
       }
 
       final l10n = lookupAppLocalizations(settings.locale.locale);
@@ -185,7 +203,14 @@ class LetterService {
         channelDescription: l10n.notificationChannelDescription,
       );
       return null;
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      developer.log(
+        'Notification schedule synchronization failed. The letters remain '
+        'saved and can be rescheduled.',
+        name: 'dearme.notifications',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return error;
     }
   }
@@ -206,8 +231,15 @@ class LetterService {
   Future<void> cancelAll() async {
     try {
       await _notifications.cancelAllScheduled();
-    } on Object {
-      // Nothing else can be done; the next sync will try again.
+    } on Object catch (error, stackTrace) {
+      // Nothing else can be done; the next sync will try again. Keep the reason
+      // in the developer log instead of swallowing it.
+      developer.log(
+        'Could not cancel the notification schedule.',
+        name: 'dearme.notifications',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -237,6 +269,7 @@ class LetterService {
       body: l10n.testNotificationBody,
       channelName: l10n.notificationChannelName,
       channelDescription: l10n.notificationChannelDescription,
+      localeCode: settings.locale.languageCode,
     );
   }
 

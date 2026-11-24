@@ -1,3 +1,7 @@
+import 'package:dearme/core/models/app_font_option.dart';
+import 'package:dearme/core/models/app_locale_option.dart';
+import 'package:dearme/core/models/app_settings.dart';
+import 'package:dearme/core/models/app_theme_option.dart';
 import 'package:dearme/core/models/letter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,5 +91,34 @@ void main() {
     await tester.tap(find.text('Sealed on a small phone'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the pixel font survives a narrow large-text settings screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.6;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+    });
+
+    await pumpTestApp(
+      tester,
+      settings: const AppSettings(
+        theme: AppThemeOption.dark,
+        locale: AppLocaleOption.russian,
+        notificationsEnabled: true,
+        font: AppFontOption.tiny5Duo,
+      ),
+    );
+    await tester.ensureVisible(find.byTooltip('Открыть настройки'));
+    await tester.tap(find.byTooltip('Открыть настройки'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Шрифт'), findsOneWidget);
   });
 }

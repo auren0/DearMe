@@ -24,13 +24,13 @@ class StatusPill extends StatelessWidget {
       LetterStatus.sealed => (
         scheme.secondaryContainer,
         scheme.onSecondaryContainer,
-        FluentIcons.line.lock_closed,
+        FluentIcons.line.clock,
         l10n.statusSealed,
       ),
       LetterStatus.ready => (
         scheme.primaryContainer,
         scheme.onPrimaryContainer,
-        FluentIcons.line.open,
+        FluentIcons.line.mail,
         l10n.statusReady,
       ),
       LetterStatus.opened => (
@@ -42,7 +42,7 @@ class StatusPill extends StatelessWidget {
       LetterStatus.draft => (
         scheme.tertiaryContainer,
         scheme.onTertiaryContainer,
-        FluentIcons.line.edit,
+        FluentIcons.line.mail_edit,
         l10n.statusDraft,
       ),
     };

@@ -17,6 +17,21 @@ void main() {
       expect(l10n.statusSealed, 'Запечатано');
       expect(l10n.homeNewLetter, 'Написать письмо');
       expect(l10n.settingsTitle, 'Настройки');
+      expect(l10n.settingsFont, 'Шрифт');
+      expect(
+        l10n.errorNotificationSchedule,
+        contains('Не удалось запланировать уведомление'),
+      );
+      expect(l10n.errorNotificationSchedule, contains('Письмо сохранено'));
+      expect(
+        l10n.errorNotificationPermissionSaved,
+        contains('Письмо сохранено'),
+      );
+      expect(l10n.notificationLimitationsWindows, contains('Windows'));
+      expect(l10n.notificationLimitationsWeb, contains('вкладка открыта'));
+      expect(l10n.webPushLocalOnly, contains('push-сервер'));
+      expect(l10n.retry, 'Повторить');
+      expect(l10n.notificationScheduleRetried, 'Уведомление запланировано.');
     },
   );
 
@@ -32,6 +47,18 @@ void main() {
       );
       expect(l10n.statusSealed, 'Sealed');
       expect(l10n.settingsTitle, 'Settings');
+      expect(l10n.settingsFont, 'Font');
+      expect(
+        l10n.errorNotificationSchedule,
+        contains('Failed to schedule notification'),
+      );
+      expect(l10n.errorNotificationSchedule, contains('saved'));
+      expect(l10n.errorNotificationPermissionSaved, contains('saved'));
+      expect(l10n.notificationLimitationsWindows, contains('Windows'));
+      expect(l10n.notificationLimitationsWeb, contains('tab is open'));
+      expect(l10n.webPushLocalOnly, contains('push server'));
+      expect(l10n.retry, 'Retry');
+      expect(l10n.notificationScheduleRetried, 'Notification scheduled.');
     },
   );
 

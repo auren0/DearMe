@@ -77,6 +77,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageWriteError => 'Could not save your changes.';
 
   @override
+  String get saveError => 'Could not save the letter.';
+
+  @override
+  String get deleteError => 'Could not delete the letter.';
+
+  @override
+  String get deleteAllError => 'Could not delete all data.';
+
+  @override
   String get storageUnavailableBanner =>
       'Storage is unavailable: letters will only last until the app restarts.';
 
@@ -529,6 +538,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageEn => 'English';
 
   @override
+  String get settingsFont => 'Font';
+
+  @override
+  String get fontGoogleSans => 'Google Sans';
+
+  @override
+  String get fontShantellSans => 'Shantell Sans';
+
+  @override
+  String get fontTiny5Duo => 'Tiny5Duo';
+
+  @override
+  String get fontGoogleSansDescription =>
+      'Clean and neutral, comfortable for long letters.';
+
+  @override
+  String get fontShantellSansDescription => 'A warm handwritten character.';
+
+  @override
+  String get fontTiny5DuoDescription => 'A pixel style for a retro mood.';
+
+  @override
   String get settingsNotifications => 'Notifications';
 
   @override
@@ -592,12 +623,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'Android may delay background delivery and may need battery optimization disabled for precise timing.';
 
   @override
+  String get notificationLimitationsAndroidInexact =>
+      'Exact alarms are restricted on Android. DearMe uses inexact reminders, so a notification may arrive slightly later.';
+
+  @override
+  String get notificationScheduleRetried => 'Notification scheduled.';
+
+  @override
+  String get webPushLocalOnly =>
+      'Letter sealed. The reminder will arrive only while this tab is open; background delivery needs a push server.';
+
+  @override
+  String get retryNotificationScheduling => 'Reschedule notifications';
+
+  @override
+  String get retryNotificationSchedulingDescription =>
+      'Try scheduling reminders for all sealed letters again.';
+
+  @override
+  String get notificationsDisabled =>
+      'Notifications are turned off in Settings.';
+
+  @override
   String get notificationLimitationsWeb =>
-      'Notifications with the tab closed require HTTPS, browser permission and a configured push server. On iOS the web app must be added to the Home Screen. Support varies by browser.';
+      'While the tab is open, DearMe can show a real browser notification. Notifications with the tab closed require HTTPS, browser permission and a configured push server. On iOS the web app must be added to the Home Screen. Support varies by browser.';
 
   @override
   String get notificationLimitationsWindows =>
-      'Windows delivers scheduled notifications. Without an MSIX package the app cannot remove an already-shown notification from Action Center, but cancelling a scheduled one works.';
+      'Windows delivers scheduled notifications. The app has no separate permission prompt — check notifications in Windows Settings. Without an MSIX package, an already-shown notification cannot be removed from Action Center, and cancelling scheduled ones may be limited.';
 
   @override
   String get notificationLimitationsMacos =>
@@ -773,11 +826,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNotificationSchedule =>
-      'The letter was saved, but the notification could not be scheduled.';
+      'Failed to schedule notification. Your letter is saved.';
 
   @override
   String get errorNotificationPermission =>
       'Notification permission was not granted.';
+
+  @override
+  String get errorNotificationPermissionSaved =>
+      'Notification permission was not granted. Your letter is saved.';
 
   @override
   String get errorNotificationUnsupported =>
@@ -813,6 +870,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String a11yThemeSelected(String theme) {
     return '$theme theme selected';
+  }
+
+  @override
+  String a11yFontSelected(String font) {
+    return '$font font selected';
   }
 
   @override

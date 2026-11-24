@@ -7,6 +7,8 @@ void showAppSnackBar(
   String message, {
   bool isError = false,
   bool isWarning = false,
+  String? actionLabel,
+  VoidCallback? onAction,
 }) {
   final messenger = rootScaffoldMessengerKey.currentState;
   if (messenger == null) {
@@ -33,6 +35,13 @@ void showAppSnackBar(
             Expanded(child: Text(message)),
           ],
         ),
+        action: actionLabel == null || onAction == null
+            ? null
+            : SnackBarAction(
+                label: actionLabel,
+                textColor: scheme?.inversePrimary,
+                onPressed: onAction,
+              ),
       ),
     );
 }

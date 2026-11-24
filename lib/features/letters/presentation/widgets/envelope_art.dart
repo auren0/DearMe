@@ -26,115 +26,120 @@ class EnvelopeArt extends StatelessWidget {
     final height = width * 0.68;
     final progress = openProgress.clamp(0.0, 1.0);
 
-    final envelope = SizedBox(
-      width: width,
-      height: height,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: <Widget>[
-          Positioned(
-            left: width * 0.1,
-            right: width * 0.1,
-            top: height * 0.18 - progress * 52,
-            height: height * 0.78,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: palette.letterPaper,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: palette.grain.withValues(alpha: 0.7)),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  width * 0.07,
-                  height * 0.16,
-                  width * 0.07,
-                  8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      height: 2,
-                      width: width * 0.28,
-                      color: palette.grain.withValues(alpha: 0.8),
-                    ),
-                    const SizedBox(height: 7),
-                    Container(
-                      height: 2,
-                      width: width * 0.4,
-                      color: palette.grain.withValues(alpha: 0.55),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _EnvelopeBodyPainter(
-                bodyColor: palette.envelope,
-                lineColor: palette.grain,
-                shadowColor: Colors.black.withValues(alpha: 0.18),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: height * 0.16,
-            height: height * 0.5,
-            child: Transform(
-              alignment: Alignment.topCenter,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.0018)
-                ..rotateX(-math.pi * 0.92 * progress),
-              child: CustomPaint(
-                painter: _EnvelopeFlapPainter(
-                  color: palette.envelopeFlap,
-                  lineColor: palette.grain,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: height * 0.42,
-            left: width / 2 - width * 0.085,
-            child: Opacity(
-              opacity: (1 - progress * 1.3).clamp(0.0, 1.0),
-              child: Container(
-                width: width * 0.17,
-                height: width * 0.17,
+    final envelope = Center(
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            Positioned(
+              left: width * 0.1,
+              right: width * 0.1,
+              top: height * 0.18 - progress * 52,
+              height: height * 0.78,
+              child: DecoratedBox(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: palette.waxSeal,
+                  color: palette.letterPaper,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: palette.grain.withValues(alpha: 0.7),
+                  ),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.24),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(
-                    color: scheme.surface.withValues(alpha: 0.18),
-                    width: 1,
-                  ),
                 ),
-                child: Icon(
-                  FluentIcons.filled.heart,
-                  size: width * 0.075,
-                  color: scheme.onError.withValues(alpha: 0.9),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    width * 0.07,
+                    height * 0.16,
+                    width * 0.07,
+                    8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        height: 2,
+                        width: width * 0.28,
+                        color: palette.grain.withValues(alpha: 0.8),
+                      ),
+                      const SizedBox(height: 7),
+                      Container(
+                        height: 2,
+                        width: width * 0.4,
+                        color: palette.grain.withValues(alpha: 0.55),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _EnvelopeBodyPainter(
+                  bodyColor: palette.envelope,
+                  lineColor: palette.grain,
+                  shadowColor: Colors.black.withValues(alpha: 0.18),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              top: height * 0.16,
+              height: height * 0.5,
+              child: Transform(
+                alignment: Alignment.topCenter,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0018)
+                  ..rotateX(-math.pi * 0.92 * progress),
+                child: CustomPaint(
+                  painter: _EnvelopeFlapPainter(
+                    color: palette.envelopeFlap,
+                    lineColor: palette.grain,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: height * 0.42,
+              left: width / 2 - width * 0.085,
+              child: Opacity(
+                opacity: (1 - progress * 1.3).clamp(0.0, 1.0),
+                child: Container(
+                  key: const ValueKey<String>('envelope-wax-seal'),
+                  width: width * 0.17,
+                  height: width * 0.17,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: palette.waxSeal,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.24),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: scheme.surface.withValues(alpha: 0.18),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    FluentIcons.filled.mail,
+                    size: width * 0.075,
+                    color: scheme.onError.withValues(alpha: 0.9),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
 

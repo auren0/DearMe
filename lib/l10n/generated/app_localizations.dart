@@ -230,6 +230,24 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить изменения.'**
   String get storageWriteError;
 
+  /// No description provided for @saveError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить письмо.'**
+  String get saveError;
+
+  /// No description provided for @deleteError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить письмо.'**
+  String get deleteError;
+
+  /// No description provided for @deleteAllError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить все данные.'**
+  String get deleteAllError;
+
   /// No description provided for @storageUnavailableBanner.
   ///
   /// In ru, this message translates to:
@@ -944,6 +962,48 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEn;
 
+  /// No description provided for @settingsFont.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шрифт'**
+  String get settingsFont;
+
+  /// No description provided for @fontGoogleSans.
+  ///
+  /// In ru, this message translates to:
+  /// **'Google Sans'**
+  String get fontGoogleSans;
+
+  /// No description provided for @fontShantellSans.
+  ///
+  /// In ru, this message translates to:
+  /// **'Shantell Sans'**
+  String get fontShantellSans;
+
+  /// No description provided for @fontTiny5Duo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Tiny5Duo'**
+  String get fontTiny5Duo;
+
+  /// No description provided for @fontGoogleSansDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чистый и нейтральный, удобно читать длинные письма.'**
+  String get fontGoogleSansDescription;
+
+  /// No description provided for @fontShantellSansDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тёплый рукописный характер.'**
+  String get fontShantellSansDescription;
+
+  /// No description provided for @fontTiny5DuoDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пиксельный стиль для ретро-настроения.'**
+  String get fontTiny5DuoDescription;
+
   /// No description provided for @settingsNotifications.
   ///
   /// In ru, this message translates to:
@@ -1058,16 +1118,52 @@ abstract class AppLocalizations {
   /// **'Android может задерживать фоновую доставку и требовать отключения оптимизации батареи для точного времени.'**
   String get notificationLimitationsAndroid;
 
+  /// No description provided for @notificationLimitationsAndroidInexact.
+  ///
+  /// In ru, this message translates to:
+  /// **'Точные будильники в Android ограничены. DearMe использует неточные напоминания, поэтому уведомление может прийти с небольшой задержкой.'**
+  String get notificationLimitationsAndroidInexact;
+
+  /// No description provided for @notificationScheduleRetried.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомление запланировано.'**
+  String get notificationScheduleRetried;
+
+  /// No description provided for @webPushLocalOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Письмо запечатано. Напоминание придёт, только пока вкладка открыта: для фоновой доставки нужен push-сервер.'**
+  String get webPushLocalOnly;
+
+  /// No description provided for @retryNotificationScheduling.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перепланировать уведомления'**
+  String get retryNotificationScheduling;
+
+  /// No description provided for @retryNotificationSchedulingDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить планирование для всех запечатанных писем.'**
+  String get retryNotificationSchedulingDescription;
+
+  /// No description provided for @notificationsDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления отключены в настройках.'**
+  String get notificationsDisabled;
+
   /// No description provided for @notificationLimitationsWeb.
   ///
   /// In ru, this message translates to:
-  /// **'Уведомления при закрытой вкладке требуют HTTPS, разрешения браузера и настроенного push-сервера. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.'**
+  /// **'Пока вкладка открыта, DearMe может показать настоящее уведомление через браузер. Для уведомлений при закрытой вкладке нужны HTTPS, разрешение браузера и настроенный push-сервер. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.'**
   String get notificationLimitationsWeb;
 
   /// No description provided for @notificationLimitationsWindows.
   ///
   /// In ru, this message translates to:
-  /// **'Windows доставляет запланированные уведомления. Без MSIX-пакета приложение не может убрать уже показанное уведомление из центра, но отмена запланированного работает.'**
+  /// **'Windows доставляет запланированные уведомления. Приложение не показывает отдельный запрос разрешения — проверь уведомления в системных настройках Windows. Без MSIX-пакета уже показанное уведомление нельзя убрать из центра, а отмена запланированных может быть ограничена.'**
   String get notificationLimitationsWindows;
 
   /// No description provided for @notificationLimitationsMacos.
@@ -1379,7 +1475,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorNotificationSchedule.
   ///
   /// In ru, this message translates to:
-  /// **'Письмо сохранено, но уведомление запланировать не удалось.'**
+  /// **'Не удалось запланировать уведомление. Письмо сохранено.'**
   String get errorNotificationSchedule;
 
   /// No description provided for @errorNotificationPermission.
@@ -1387,6 +1483,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Разрешение на уведомления не получено.'**
   String get errorNotificationPermission;
+
+  /// No description provided for @errorNotificationPermissionSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешение на уведомления не получено. Письмо сохранено.'**
+  String get errorNotificationPermissionSaved;
 
   /// No description provided for @errorNotificationUnsupported.
   ///
@@ -1447,6 +1549,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выбрана тема {theme}'**
   String a11yThemeSelected(String theme);
+
+  /// No description provided for @a11yFontSelected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбран шрифт {font}'**
+  String a11yFontSelected(String font);
 
   /// No description provided for @a11yLanguageSelected.
   ///

@@ -24,6 +24,9 @@
   "unexpectedError": "Что-то пошло не так. Попробуй ещё раз.",
   "storageError": "Не удалось загрузить письма.",
   "storageWriteError": "Не удалось сохранить изменения.",
+  "saveError": "Не удалось сохранить письмо.",
+  "deleteError": "Не удалось удалить письмо.",
+  "deleteAllError": "Не удалось удалить все данные.",
   "storageUnavailableBanner": "Хранилище недоступно: письма сохранятся только до перезапуска приложения.",
   "settingsSaveError": "Не удалось сохранить настройку.",
   "loadErrorTitle": "Не получилось загрузить письма",
@@ -295,6 +298,13 @@
   "settingsLanguage": "Язык",
   "languageRu": "Русский",
   "languageEn": "English",
+  "settingsFont": "Шрифт",
+  "fontGoogleSans": "Google Sans",
+  "fontShantellSans": "Shantell Sans",
+  "fontTiny5Duo": "Tiny5Duo",
+  "fontGoogleSansDescription": "Чистый и нейтральный, удобно читать длинные письма.",
+  "fontShantellSansDescription": "Тёплый рукописный характер.",
+  "fontTiny5DuoDescription": "Пиксельный стиль для ретро-настроения.",
   "settingsNotifications": "Уведомления",
   "settingsNotificationsEnabled": "Напоминать об открытии",
   "settingsNotificationsDescription": "Системное уведомление придёт, когда письмо будет готово.",
@@ -314,8 +324,14 @@
   "notificationLimitationsLinux": "Linux не предоставляет системный планировщик локальных уведомлений. Уведомления придут, пока DearMe запущено; само уведомление при этом системное.",
   "notificationLimitationsIos": "iOS хранит не более 64 ожидающих уведомлений. DearMe планирует ближайшие 60, остальные добавит при следующем запуске.",
   "notificationLimitationsAndroid": "Android может задерживать фоновую доставку и требовать отключения оптимизации батареи для точного времени.",
-  "notificationLimitationsWeb": "Уведомления при закрытой вкладке требуют HTTPS, разрешения браузера и настроенного push-сервера. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.",
-  "notificationLimitationsWindows": "Windows доставляет запланированные уведомления. Без MSIX-пакета приложение не может убрать уже показанное уведомление из центра, но отмена запланированного работает.",
+  "notificationLimitationsAndroidInexact": "Точные будильники в Android ограничены. DearMe использует неточные напоминания, поэтому уведомление может прийти с небольшой задержкой.",
+  "notificationScheduleRetried": "Уведомление запланировано.",
+  "webPushLocalOnly": "Письмо запечатано. Напоминание придёт, только пока вкладка открыта: для фоновой доставки нужен push-сервер.",
+  "retryNotificationScheduling": "Перепланировать уведомления",
+  "retryNotificationSchedulingDescription": "Повторить планирование для всех запечатанных писем.",
+  "notificationsDisabled": "Уведомления отключены в настройках.",
+  "notificationLimitationsWeb": "Пока вкладка открыта, DearMe может показать настоящее уведомление через браузер. Для уведомлений при закрытой вкладке нужны HTTPS, разрешение браузера и настроенный push-сервер. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.",
+  "notificationLimitationsWindows": "Windows доставляет запланированные уведомления. Приложение не показывает отдельный запрос разрешения — проверь уведомления в системных настройках Windows. Без MSIX-пакета уже показанное уведомление нельзя убрать из центра, а отмена запланированных может быть ограничена.",
   "notificationLimitationsMacos": "macOS использует системные уведомления. Разрешение можно изменить в Системных настройках.",
   "notificationLimitationsNone": "Платформа поддерживает системные уведомления.",
   "notificationLimitationsWebUnsupported": "Этот браузер не поддерживает Web Push или Service Worker, поэтому фоновые уведомления недоступны.",
@@ -403,8 +419,9 @@
   "testNotificationTitle": "DearMe на связи",
   "testNotificationBody": "Уведомления настроены. Письма из прошлого найдут тебя.",
 
-  "errorNotificationSchedule": "Письмо сохранено, но уведомление запланировать не удалось.",
+  "errorNotificationSchedule": "Не удалось запланировать уведомление. Письмо сохранено.",
   "errorNotificationPermission": "Разрешение на уведомления не получено.",
+  "errorNotificationPermissionSaved": "Разрешение на уведомления не получено. Письмо сохранено.",
   "errorNotificationUnsupported": "Уведомления недоступны на этой платформе.",
   "errorImportRead": "Не удалось прочитать выбранный файл.",
   "errorImportParse": "Файл повреждён или имеет неверный формат.",
@@ -429,6 +446,14 @@
   "@a11yThemeSelected": {
     "placeholders": {
       "theme": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yFontSelected": "Выбран шрифт {font}",
+  "@a11yFontSelected": {
+    "placeholders": {
+      "font": {
         "type": "String"
       }
     }

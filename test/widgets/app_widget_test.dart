@@ -2,6 +2,7 @@ import 'package:dearme/core/models/app_locale_option.dart';
 import 'package:dearme/core/models/app_settings.dart';
 import 'package:dearme/core/models/app_theme_option.dart';
 import 'package:dearme/core/models/letter.dart';
+import 'package:dearme/core/services/notification_service.dart';
 import 'package:dearme/features/letters/presentation/letter_detail_screen.dart';
 import 'package:dearme/features/letters/presentation/letter_editor_screen.dart';
 import 'package:dearme/features/settings/presentation/settings_screen.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fluent_icons_kit/fluent_icons_kit.dart';
 
+import '../support/fake_notification_service.dart';
 import '../support/test_app.dart';
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
@@ -212,6 +214,108 @@ void main() {
     expect(find.text(ru.editorBodyRequired), findsOneWidget);
     expect(find.text(ru.saveConfirmTitle), findsNothing);
   });
+
+  testWidgets(
+    'a notification failure keeps the letter and follows the new language',
+    (tester) async {
+      final notifications = FakeNotificationService(
+        syncError: const NotificationException('scheduler failed'),
+      );
+      final harness = await pumpTestApp(tester, notifications: notifications);
+
+      await tapVisible(tester, find.byTooltip(ru.a11yOpenSettings));
+      await tapVisible(tester, find.text(ru.languageEn));
+      expect(find.text(en.settingsTitle), findsOneWidget);
+
+      await tapVisible(tester, find.byTooltip(en.a11yBack));
+      await tapVisible(tester, find.text(en.homeNewLetter).first);
+      await tester.enterText(find.byType(TextFormField).at(0), 'Saved offline');
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'Only the reminder failed.',
+      );
+      await tester.pumpAndSettle();
+
+      await tapVisible(tester, find.text(en.sealLetter));
+      await tapVisible(tester, find.text(en.saveConfirmAction));
+
+      expect(find.byType(LetterDetailScreen), findsOneWidget);
+      final stored = await harness.repository.getAll();
+      expect(stored.single.title, 'Saved offline');
+      expect(stored.single.isDraft, isFalse);
+      expect(find.text(en.errorNotificationSchedule), findsOneWidget);
+      expect(find.text(en.retry), findsOneWidget);
+
+      // The retry action must rebuild the schedule from the saved letter.
+      notifications.syncError = null;
+      await tapVisible(tester, find.text(en.retry));
+
+      expect(harness.notifications.scheduled.length, 1);
+      expect(harness.notifications.scheduled.single.letterId, stored.single.id);
+      expect(find.text(en.notificationScheduleRetried), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'sealing asks for notification permission and still saves on denial',
+    (tester) async {
+      final notifications = FakeNotificationService(
+        permission: NotificationPermissionStatus.denied,
+      );
+      final harness = await pumpTestApp(tester, notifications: notifications);
+
+      await tapVisible(tester, find.text(ru.homeNewLetter).first);
+      await tester.enterText(
+        find.byType(TextFormField).at(0),
+        'Permission test',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'The letter must survive a denied permission.',
+      );
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text(ru.sealLetter));
+      await tapVisible(tester, find.text(ru.saveConfirmAction));
+
+      expect(notifications.requestPermissionCount, 1);
+      expect(find.byType(LetterDetailScreen), findsOneWidget);
+      final stored = await harness.repository.getAll();
+      expect(stored.single.title, 'Permission test');
+      expect(stored.single.isDraft, isFalse);
+      expect(find.text(ru.errorNotificationPermissionSaved), findsOneWidget);
+      expect(find.text(ru.openSystemSettings), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'sealing warns when notifications are disabled but still saves the letter',
+    (tester) async {
+      final harness = await pumpTestApp(
+        tester,
+        settings: const AppSettings(
+          theme: AppThemeOption.dark,
+          locale: AppLocaleOption.russian,
+          notificationsEnabled: false,
+        ),
+      );
+
+      await tapVisible(tester, find.text(ru.homeNewLetter).first);
+      await tester.enterText(find.byType(TextFormField).at(0), 'Silent letter');
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'Saved even without reminders.',
+      );
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text(ru.sealLetter));
+      await tapVisible(tester, find.text(ru.saveConfirmAction));
+
+      expect(find.byType(LetterDetailScreen), findsOneWidget);
+      final stored = await harness.repository.getAll();
+      expect(stored.single.title, 'Silent letter');
+      expect(stored.single.isDraft, isFalse);
+      expect(find.text(ru.notificationsDisabled), findsOneWidget);
+    },
+  );
 
   testWidgets('the settings screen shows data counts', (tester) async {
     final now = DateTime.utc(2026, 6, 1, 12);

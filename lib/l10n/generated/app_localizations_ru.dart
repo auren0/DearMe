@@ -77,6 +77,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get storageWriteError => 'Не удалось сохранить изменения.';
 
   @override
+  String get saveError => 'Не удалось сохранить письмо.';
+
+  @override
+  String get deleteError => 'Не удалось удалить письмо.';
+
+  @override
+  String get deleteAllError => 'Не удалось удалить все данные.';
+
+  @override
   String get storageUnavailableBanner =>
       'Хранилище недоступно: письма сохранятся только до перезапуска приложения.';
 
@@ -541,6 +550,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageEn => 'English';
 
   @override
+  String get settingsFont => 'Шрифт';
+
+  @override
+  String get fontGoogleSans => 'Google Sans';
+
+  @override
+  String get fontShantellSans => 'Shantell Sans';
+
+  @override
+  String get fontTiny5Duo => 'Tiny5Duo';
+
+  @override
+  String get fontGoogleSansDescription =>
+      'Чистый и нейтральный, удобно читать длинные письма.';
+
+  @override
+  String get fontShantellSansDescription => 'Тёплый рукописный характер.';
+
+  @override
+  String get fontTiny5DuoDescription =>
+      'Пиксельный стиль для ретро-настроения.';
+
+  @override
   String get settingsNotifications => 'Уведомления';
 
   @override
@@ -604,12 +636,33 @@ class AppLocalizationsRu extends AppLocalizations {
       'Android может задерживать фоновую доставку и требовать отключения оптимизации батареи для точного времени.';
 
   @override
+  String get notificationLimitationsAndroidInexact =>
+      'Точные будильники в Android ограничены. DearMe использует неточные напоминания, поэтому уведомление может прийти с небольшой задержкой.';
+
+  @override
+  String get notificationScheduleRetried => 'Уведомление запланировано.';
+
+  @override
+  String get webPushLocalOnly =>
+      'Письмо запечатано. Напоминание придёт, только пока вкладка открыта: для фоновой доставки нужен push-сервер.';
+
+  @override
+  String get retryNotificationScheduling => 'Перепланировать уведомления';
+
+  @override
+  String get retryNotificationSchedulingDescription =>
+      'Повторить планирование для всех запечатанных писем.';
+
+  @override
+  String get notificationsDisabled => 'Уведомления отключены в настройках.';
+
+  @override
   String get notificationLimitationsWeb =>
-      'Уведомления при закрытой вкладке требуют HTTPS, разрешения браузера и настроенного push-сервера. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.';
+      'Пока вкладка открыта, DearMe может показать настоящее уведомление через браузер. Для уведомлений при закрытой вкладке нужны HTTPS, разрешение браузера и настроенный push-сервер. На iOS веб-приложение нужно добавить на экран «Домой». Поддержка зависит от браузера.';
 
   @override
   String get notificationLimitationsWindows =>
-      'Windows доставляет запланированные уведомления. Без MSIX-пакета приложение не может убрать уже показанное уведомление из центра, но отмена запланированного работает.';
+      'Windows доставляет запланированные уведомления. Приложение не показывает отдельный запрос разрешения — проверь уведомления в системных настройках Windows. Без MSIX-пакета уже показанное уведомление нельзя убрать из центра, а отмена запланированных может быть ограничена.';
 
   @override
   String get notificationLimitationsMacos =>
@@ -784,11 +837,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorNotificationSchedule =>
-      'Письмо сохранено, но уведомление запланировать не удалось.';
+      'Не удалось запланировать уведомление. Письмо сохранено.';
 
   @override
   String get errorNotificationPermission =>
       'Разрешение на уведомления не получено.';
+
+  @override
+  String get errorNotificationPermissionSaved =>
+      'Разрешение на уведомления не получено. Письмо сохранено.';
 
   @override
   String get errorNotificationUnsupported =>
@@ -823,6 +880,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String a11yThemeSelected(String theme) {
     return 'Выбрана тема $theme';
+  }
+
+  @override
+  String a11yFontSelected(String font) {
+    return 'Выбран шрифт $font';
   }
 
   @override

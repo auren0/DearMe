@@ -104,7 +104,7 @@ class HomeScreen extends ConsumerWidget {
                         ..._section(
                           context,
                           title: context.l10n.homeReadySection,
-                          icon: FluentIcons.line.open,
+                          icon: FluentIcons.line.mail,
                           count: ready.length,
                           letters: ready,
                           now: now,
@@ -114,7 +114,7 @@ class HomeScreen extends ConsumerWidget {
                         ..._section(
                           context,
                           title: context.l10n.homeSealedSection,
-                          icon: FluentIcons.line.lock_closed,
+                          icon: FluentIcons.line.clock,
                           count: sealed.length,
                           letters: sealed,
                           now: now,
@@ -123,7 +123,7 @@ class HomeScreen extends ConsumerWidget {
                         ..._section(
                           context,
                           title: context.l10n.homeDraftsSection,
-                          icon: FluentIcons.line.edit,
+                          icon: FluentIcons.line.mail_edit,
                           count: drafts.length,
                           letters: drafts,
                           now: now,
@@ -405,7 +405,7 @@ class _StatsRow extends StatelessWidget {
             SizedBox(
               width: width,
               child: _StatTile(
-                icon: FluentIcons.line.lock_closed,
+                icon: FluentIcons.line.clock,
                 label: l10n.statSealed,
                 value: stats.sealed,
               ),
@@ -413,7 +413,7 @@ class _StatsRow extends StatelessWidget {
             SizedBox(
               width: width,
               child: _StatTile(
-                icon: FluentIcons.line.open,
+                icon: FluentIcons.line.mail,
                 label: l10n.statReady,
                 value: stats.ready,
                 highlighted: stats.ready > 0,

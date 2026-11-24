@@ -20,6 +20,7 @@ class NotificationPlatformInfo {
     required this.supportsNativeScheduling,
     required this.requiresRunningApp,
     required this.supportsSystemSettings,
+    required this.supportsPermissionRequest,
     required this.supportsWebPush,
     required this.webPushConfigured,
     required this.platformName,
@@ -29,6 +30,11 @@ class NotificationPlatformInfo {
   final bool supportsNativeScheduling;
   final bool requiresRunningApp;
   final bool supportsSystemSettings;
+
+  /// Whether the platform exposes a runtime notification-permission prompt.
+  /// Windows and Linux manage this in system settings, so the in-app button is
+  /// hidden there.
+  final bool supportsPermissionRequest;
   final bool supportsWebPush;
   final bool webPushConfigured;
   final String platformName;
@@ -49,13 +55,36 @@ class ScheduledLetter {
 }
 
 class NotificationException implements Exception {
-  const NotificationException(this.message, [this.cause]);
+  const NotificationException(
+    this.message, [
+    this.cause,
+    this.technicalDetails,
+  ]);
 
   final String message;
   final Object? cause;
 
+  /// Developer-facing context (platform error code, notification id, time zone)
+  /// that must never be shown to the user verbatim.
+  final String? technicalDetails;
+
   @override
-  String toString() => 'NotificationException: $message';
+  String toString() {
+    final details = technicalDetails;
+    return 'NotificationException: $message'
+        '${details == null ? '' : ' ($details)'}';
+  }
+}
+
+class NotificationPermissionException extends NotificationException {
+  const NotificationPermissionException([
+    Object? cause,
+    String? technicalDetails,
+  ]) : super(
+         'Notification permission is not granted.',
+         cause,
+         technicalDetails,
+       );
 }
 
 /// Platform-agnostic notification contract.
@@ -92,6 +121,7 @@ abstract interface class NotificationService {
     required String body,
     required String channelName,
     required String channelDescription,
+    required String localeCode,
   });
 
   Future<bool> openSystemSettings();
@@ -121,6 +151,7 @@ class UnsupportedNotificationService implements NotificationService {
     supportsNativeScheduling: false,
     requiresRunningApp: false,
     supportsSystemSettings: false,
+    supportsPermissionRequest: false,
     supportsWebPush: false,
     webPushConfigured: false,
     platformName: 'unsupported',
@@ -153,6 +184,7 @@ class UnsupportedNotificationService implements NotificationService {
     required String body,
     required String channelName,
     required String channelDescription,
+    required String localeCode,
   }) async => false;
 
   @override

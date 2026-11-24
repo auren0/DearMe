@@ -24,6 +24,9 @@
   "unexpectedError": "Something went wrong. Please try again.",
   "storageError": "Could not load your letters.",
   "storageWriteError": "Could not save your changes.",
+  "saveError": "Could not save the letter.",
+  "deleteError": "Could not delete the letter.",
+  "deleteAllError": "Could not delete all data.",
   "storageUnavailableBanner": "Storage is unavailable: letters will only last until the app restarts.",
   "settingsSaveError": "Could not save this setting.",
   "loadErrorTitle": "Your letters could not be loaded",
@@ -295,6 +298,13 @@
   "settingsLanguage": "Language",
   "languageRu": "Russian",
   "languageEn": "English",
+  "settingsFont": "Font",
+  "fontGoogleSans": "Google Sans",
+  "fontShantellSans": "Shantell Sans",
+  "fontTiny5Duo": "Tiny5Duo",
+  "fontGoogleSansDescription": "Clean and neutral, comfortable for long letters.",
+  "fontShantellSansDescription": "A warm handwritten character.",
+  "fontTiny5DuoDescription": "A pixel style for a retro mood.",
   "settingsNotifications": "Notifications",
   "settingsNotificationsEnabled": "Remind me when letters open",
   "settingsNotificationsDescription": "A system notification arrives when a letter is ready.",
@@ -314,8 +324,14 @@
   "notificationLimitationsLinux": "Linux has no system scheduler for local notifications. Notifications arrive while DearMe is running; the notification itself is a real system notification.",
   "notificationLimitationsIos": "iOS keeps at most 64 pending notifications. DearMe schedules the next 60 and adds the rest on the next launch.",
   "notificationLimitationsAndroid": "Android may delay background delivery and may need battery optimization disabled for precise timing.",
-  "notificationLimitationsWeb": "Notifications with the tab closed require HTTPS, browser permission and a configured push server. On iOS the web app must be added to the Home Screen. Support varies by browser.",
-  "notificationLimitationsWindows": "Windows delivers scheduled notifications. Without an MSIX package the app cannot remove an already-shown notification from Action Center, but cancelling a scheduled one works.",
+  "notificationLimitationsAndroidInexact": "Exact alarms are restricted on Android. DearMe uses inexact reminders, so a notification may arrive slightly later.",
+  "notificationScheduleRetried": "Notification scheduled.",
+  "webPushLocalOnly": "Letter sealed. The reminder will arrive only while this tab is open; background delivery needs a push server.",
+  "retryNotificationScheduling": "Reschedule notifications",
+  "retryNotificationSchedulingDescription": "Try scheduling reminders for all sealed letters again.",
+  "notificationsDisabled": "Notifications are turned off in Settings.",
+  "notificationLimitationsWeb": "While the tab is open, DearMe can show a real browser notification. Notifications with the tab closed require HTTPS, browser permission and a configured push server. On iOS the web app must be added to the Home Screen. Support varies by browser.",
+  "notificationLimitationsWindows": "Windows delivers scheduled notifications. The app has no separate permission prompt — check notifications in Windows Settings. Without an MSIX package, an already-shown notification cannot be removed from Action Center, and cancelling scheduled ones may be limited.",
   "notificationLimitationsMacos": "macOS uses system notifications. You can change permission in System Settings.",
   "notificationLimitationsNone": "The platform supports system notifications.",
   "notificationLimitationsWebUnsupported": "This browser does not support Web Push or Service Workers, so background notifications are unavailable.",
@@ -403,8 +419,9 @@
   "testNotificationTitle": "DearMe is here",
   "testNotificationBody": "Notifications are ready. Letters from the past will find you.",
 
-  "errorNotificationSchedule": "The letter was saved, but the notification could not be scheduled.",
+  "errorNotificationSchedule": "Failed to schedule notification. Your letter is saved.",
   "errorNotificationPermission": "Notification permission was not granted.",
+  "errorNotificationPermissionSaved": "Notification permission was not granted. Your letter is saved.",
   "errorNotificationUnsupported": "Notifications are not available on this platform.",
   "errorImportRead": "Could not read the selected file.",
   "errorImportParse": "The file is damaged or has an unsupported format.",
@@ -429,6 +446,14 @@
   "@a11yThemeSelected": {
     "placeholders": {
       "theme": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yFontSelected": "{font} font selected",
+  "@a11yFontSelected": {
+    "placeholders": {
+      "font": {
         "type": "String"
       }
     }

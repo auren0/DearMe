@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:fluent_icons_kit/fluent_icons_kit.dart';
@@ -7,10 +8,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_date_format.dart';
 import '../../../app/localization/l10n_extension.dart';
+import '../../../app/notification_retry.dart';
 import '../../../app/providers.dart';
 import '../../../app/snackbar.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/models/letter.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../shared/widgets/app_background.dart';
 import '../../../shared/widgets/content_width.dart';
 
@@ -281,6 +284,40 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     return true;
   }
 
+  Future<void> _requestNotificationPermissionIfNeeded() async {
+    final service = ref.read(letterServiceProvider);
+    final settings = ref.read(settingsControllerProvider);
+    if (!settings.notificationsEnabled ||
+        !service.platformInfo.supportsPermissionRequest) {
+      return;
+    }
+    try {
+      final status = await service.permissionStatus();
+      if (status.isGranted) {
+        return;
+      }
+      // Do not re-prompt after a denial: Android and browsers often suppress
+      // the dialog, and the settings/error action is the honest path then.
+      if (status == NotificationPermissionStatus.denied &&
+          settings.notificationPermissionRequested) {
+        return;
+      }
+      await service.requestPermission();
+      await ref
+          .read(settingsControllerProvider.notifier)
+          .setNotificationPermissionRequested(true);
+      ref.invalidate(notificationPermissionProvider);
+    } on Object catch (error, stackTrace) {
+      // A permission prompt must never prevent the letter from being saved.
+      developer.log(
+        'Could not request notification permission while sealing a letter.',
+        name: 'dearme.notifications',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   Future<void> _sealLetter() async {
     final l10n = context.l10n;
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -315,6 +352,13 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       return;
     }
 
+    // Ask at the moment the user seals a letter, which is a valid user gesture
+    // for Android, iOS and browsers. Denial never blocks the save below.
+    await _requestNotificationPermissionIfNeeded();
+    if (!mounted) {
+      return;
+    }
+
     _autosaveTimer?.cancel();
     setState(() => _saving = true);
     try {
@@ -326,14 +370,26 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         return;
       }
       if (result.notificationError != null) {
-        showAppSnackBar(l10n.errorNotificationSchedule, isWarning: true);
+        showNotificationScheduleError(
+          context,
+          ref,
+          error: result.notificationError,
+        );
       } else {
-        showAppSnackBar(_isNew ? l10n.sealedSuccess : l10n.letterUpdated);
+        final platform = ref.read(letterServiceProvider).platformInfo;
+        final settings = ref.read(settingsControllerProvider);
+        if (!settings.notificationsEnabled) {
+          showAppSnackBar(l10n.notificationsDisabled, isWarning: true);
+        } else if (platform.isWeb && !platform.webPushConfigured) {
+          showAppSnackBar(l10n.webPushLocalOnly, isWarning: true);
+        } else {
+          showAppSnackBar(_isNew ? l10n.sealedSuccess : l10n.letterUpdated);
+        }
       }
       context.go('/letter/${result.letter.id}');
     } on Object {
       if (mounted) {
-        showAppSnackBar(l10n.storageWriteError, isError: true);
+        showAppSnackBar(l10n.saveError, isError: true);
       }
     } finally {
       if (mounted) {
@@ -387,7 +443,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       await _leaveNow();
     } on Object {
       if (mounted) {
-        showAppSnackBar(l10n.storageWriteError, isError: true);
+        showAppSnackBar(l10n.deleteError, isError: true);
       }
     } finally {
       if (mounted) {

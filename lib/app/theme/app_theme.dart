@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
+import '../../../core/models/app_font_option.dart';
 import '../../../core/models/app_theme_option.dart';
 
 /// Decorative, non-semantic colours used by DearMe's bespoke visuals.
@@ -129,7 +130,6 @@ class DearMePalette extends ThemeExtension<DearMePalette> {
 
 /// Centralised Material 3 theme factory.
 abstract final class AppTheme {
-  static const String fontFamily = 'Tiny5Duo';
   static const List<String> fontFallback = <String>[
     'Segoe UI Emoji',
     'Apple Color Emoji',
@@ -137,13 +137,42 @@ abstract final class AppTheme {
     'sans-serif',
   ];
 
-  static ThemeData of(AppThemeOption option) {
-    return switch (option) {
-      AppThemeOption.light => light,
-      AppThemeOption.dark => dark,
-      AppThemeOption.oled => oled,
-    };
+  /// Theme objects are reused across rebuilds so changing a font or a theme
+  /// does not rebuild thousands of text styles on every frame.
+  static final Map<String, ThemeData> _themeCache = <String, ThemeData>{};
+
+  static ThemeData of(
+    AppThemeOption option, {
+    AppFontOption font = AppFontOption.googleSans,
+  }) {
+    final key = '${option.storageKey}:${font.storageKey}';
+    return _themeCache.putIfAbsent(key, () {
+      return switch (option) {
+        AppThemeOption.light => _build(
+          scheme: _lightScheme(),
+          palette: DearMePalette.light,
+          isOled: false,
+          font: font,
+        ),
+        AppThemeOption.dark => _build(
+          scheme: _darkScheme(),
+          palette: DearMePalette.dark,
+          isOled: false,
+          font: font,
+        ),
+        AppThemeOption.oled => _build(
+          scheme: _oledScheme(),
+          palette: DearMePalette.oled,
+          isOled: true,
+          font: font,
+        ),
+      };
+    });
   }
+
+  static ThemeData get light => of(AppThemeOption.light);
+  static ThemeData get dark => of(AppThemeOption.dark);
+  static ThemeData get oled => of(AppThemeOption.oled);
 
   static ColorScheme _lightScheme() {
     return ColorScheme.fromSeed(
@@ -345,9 +374,10 @@ abstract final class AppTheme {
     required ColorScheme scheme,
     required DearMePalette palette,
     required bool isOled,
+    required AppFontOption font,
   }) {
     final textTheme = _textTheme.apply(
-      fontFamily: fontFamily,
+      fontFamily: font.family,
       fontFamilyFallback: fontFallback,
       bodyColor: scheme.onSurface,
       displayColor: scheme.onSurface,
@@ -364,7 +394,7 @@ abstract final class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: isOled ? Colors.black : scheme.surface,
       canvasColor: isOled ? Colors.black : scheme.surface,
-      fontFamily: fontFamily,
+      fontFamily: font.family,
       fontFamilyFallback: fontFallback,
       textTheme: textTheme,
       extensions: <ThemeExtension<dynamic>>[palette],
@@ -515,8 +545,7 @@ abstract final class AppTheme {
       listTileTheme: ListTileThemeData(
         iconColor: scheme.onSurfaceVariant,
         textColor: scheme.onSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
       dividerTheme: DividerThemeData(
         color: scheme.outlineVariant,
@@ -613,22 +642,4 @@ abstract final class AppTheme {
       ),
     );
   }
-
-  static final ThemeData light = _build(
-    scheme: _lightScheme(),
-    palette: DearMePalette.light,
-    isOled: false,
-  );
-
-  static final ThemeData dark = _build(
-    scheme: _darkScheme(),
-    palette: DearMePalette.dark,
-    isOled: false,
-  );
-
-  static final ThemeData oled = _build(
-    scheme: _oledScheme(),
-    palette: DearMePalette.oled,
-    isOled: true,
-  );
 }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_date_format.dart';
 import '../../../app/localization/l10n_extension.dart';
+import '../../../app/notification_retry.dart';
 import '../../../app/providers.dart';
 import '../../../app/snackbar.dart';
 import '../../../app/theme/app_theme.dart';
@@ -79,15 +80,16 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
         return;
       }
       if (result.notificationError != null) {
-        showAppSnackBar(
-          context.l10n.errorNotificationSchedule,
-          isWarning: true,
+        showNotificationScheduleError(
+          context,
+          ref,
+          error: result.notificationError,
         );
       }
     } on Object {
       if (mounted) {
         setState(() => _opening = false);
-        showAppSnackBar(context.l10n.storageWriteError, isError: true);
+        showAppSnackBar(context.l10n.saveError, isError: true);
       }
     }
   }
@@ -121,16 +123,17 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
         return;
       }
       if (result.notificationError != null) {
-        showAppSnackBar(
-          context.l10n.errorNotificationSchedule,
-          isWarning: true,
+        showNotificationScheduleError(
+          context,
+          ref,
+          error: result.notificationError,
         );
       } else {
         showAppSnackBar(context.l10n.rescheduleSuccess);
       }
     } on Object {
       if (mounted) {
-        showAppSnackBar(context.l10n.storageWriteError, isError: true);
+        showAppSnackBar(context.l10n.saveError, isError: true);
       }
     } finally {
       if (mounted) {
@@ -180,7 +183,7 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
       context.go('/');
     } on Object {
       if (mounted) {
-        showAppSnackBar(l10n.storageWriteError, isError: true);
+        showAppSnackBar(l10n.deleteError, isError: true);
       }
     } finally {
       if (mounted) {
@@ -530,7 +533,7 @@ class _SealedLetter extends StatelessWidget {
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Icon(FluentIcons.line.open),
+                : Icon(FluentIcons.line.mail),
             label: Text(l10n.detailOpenButton),
           ),
         ],
@@ -676,7 +679,7 @@ class _OpenedLetter extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Icon(
-                          FluentIcons.line.heart,
+                          FluentIcons.line.mail_read,
                           size: 15,
                           color: palette.waxSeal.withValues(alpha: 0.8),
                         ),

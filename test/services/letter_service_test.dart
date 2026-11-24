@@ -236,6 +236,7 @@ void main() {
         );
 
         expect(result.letter.isDraft, isFalse);
+        expect(result.notificationError, isA<NotificationException>());
         expect(notifications.scheduled, isEmpty);
         expect(notifications.cancelAllCount, greaterThan(0));
         expect((await repository.getAll()).single.isDraft, isFalse);
@@ -311,6 +312,37 @@ void main() {
         expect(result.letter.isDraft, isFalse);
         expect(result.notificationError, isA<NotificationException>());
         expect((await repository.getAll()).single.isDraft, isFalse);
+      },
+    );
+
+    test(
+      'a failed notification can be retried without touching the letter',
+      () async {
+        final draft = Letter.create(now: now, title: 'Draft', body: 'Body');
+        final openAt = now.add(const Duration(days: 2));
+        final repository = FakeLetterRepository(<Letter>[draft]);
+        final notifications = FakeNotificationService(
+          syncError: const NotificationException('scheduler failed'),
+        );
+        final service = buildService(
+          repository: repository,
+          notifications: notifications,
+        );
+
+        final first = await service.seal(letter: draft, openAt: openAt);
+        expect(first.notificationError, isNotNull);
+        expect(notifications.scheduled, isEmpty);
+
+        // The OS scheduler recovers (or the user grants a permission).
+        notifications.syncError = null;
+        final retryError = await service.synchronizeSchedules();
+
+        expect(retryError, isNull);
+        expect(notifications.scheduled.single.letterId, draft.id);
+        expect(notifications.scheduled.single.openAt, openAt);
+        final stored = (await repository.getAll()).single;
+        expect(stored.isDraft, isFalse);
+        expect(stored.openAt, openAt);
       },
     );
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
@@ -32,6 +33,11 @@ class WebPushNotificationService implements NotificationService {
     'content-type': 'application/json',
   };
 
+  /// Real browser notifications shown while the tab is open when no Web Push
+  /// backend is configured. Browsers have no background scheduler, so these
+  /// timers are a documented fallback, not a replacement for Web Push.
+  final Map<int, Timer> _localTimers = <int, Timer>{};
+
   String? _vapidPublicKey;
   String _localeCode = 'ru';
   VoidCallback? _onSubscriptionChanged;
@@ -42,12 +48,23 @@ class WebPushNotificationService implements NotificationService {
 
   bool get _apiConfigured => _apiBase.trim().isNotEmpty;
 
-  bool get _isSupported {
+  bool get _canShowNotifications {
     try {
       // Accessing these members is the reliable capability check; some
       // browsers expose them as inherited globals that `hasProperty` misses.
       web.Notification.permission;
       web.window.navigator.serviceWorker;
+      return true;
+    } on Object {
+      return false;
+    }
+  }
+
+  bool get _isSupported {
+    if (!_canShowNotifications) {
+      return false;
+    }
+    try {
       return web.window.getProperty<JSAny?>('PushManager'.toJS) != null;
     } on Object {
       return false;
@@ -61,6 +78,7 @@ class WebPushNotificationService implements NotificationService {
       supportsNativeScheduling: false,
       requiresRunningApp: false,
       supportsSystemSettings: false,
+      supportsPermissionRequest: _canShowNotifications,
       supportsWebPush: _isSupported,
       webPushConfigured: _apiConfigured,
       platformName: 'web',
@@ -113,7 +131,7 @@ class WebPushNotificationService implements NotificationService {
 
   @override
   Future<NotificationPermissionStatus> permissionStatus() async {
-    if (!_isSupported) {
+    if (!_canShowNotifications) {
       return NotificationPermissionStatus.unsupported;
     }
     try {
@@ -129,7 +147,7 @@ class WebPushNotificationService implements NotificationService {
 
   @override
   Future<NotificationPermissionStatus> requestPermission() async {
-    if (!_isSupported) {
+    if (!_canShowNotifications) {
       return NotificationPermissionStatus.unsupported;
     }
     try {
@@ -154,16 +172,26 @@ class WebPushNotificationService implements NotificationService {
     required String channelDescription,
   }) async {
     _localeCode = localeCode;
-    if (!_isSupported) {
-      throw const NotificationException('Web Push is not supported.');
-    }
-    if (!_apiConfigured) {
-      throw const NotificationException(
-        'The Web Push backend is not configured.',
-      );
+    if (!_canShowNotifications) {
+      throw const NotificationException('Web notifications are not supported.');
     }
     if (!(await permissionStatus()).isGranted) {
       throw const NotificationException('Notification permission is missing.');
+    }
+
+    _cancelLocalTimers();
+
+    if (!_apiConfigured || !_isSupported) {
+      // Without a push server the browser cannot deliver a notification while
+      // the tab is closed. We still show a real notification at the opening
+      // instant while this tab is alive. Settings states the limitation.
+      _scheduleLocalTimers(letters, title: title, body: body);
+      developer.log(
+        'Web Push is unavailable; scheduled '
+        '${_localTimers.length} in-page notification(s).',
+        name: 'dearme.notifications',
+      );
+      return;
     }
 
     await _ensureConfiguration();
@@ -189,8 +217,68 @@ class WebPushNotificationService implements NotificationService {
     _serverReachable = true;
   }
 
+  void _cancelLocalTimers() {
+    for (final timer in _localTimers.values) {
+      timer.cancel();
+    }
+    _localTimers.clear();
+  }
+
+  void _scheduleLocalTimers(
+    List<ScheduledLetter> letters, {
+    required String title,
+    required String body,
+  }) {
+    final now = DateTime.now();
+    for (final letter in letters) {
+      final delay = letter.openAt.difference(now);
+      if (delay <= Duration.zero) {
+        continue;
+      }
+      _localTimers[letter.notificationId] = Timer(delay, () {
+        _localTimers.remove(letter.notificationId);
+        unawaited(
+          _showLocalNotification(
+            title: title,
+            body: body,
+            notificationId: letter.notificationId,
+          ),
+        );
+      });
+    }
+  }
+
+  Future<void> _showLocalNotification({
+    required String title,
+    required String body,
+    required int notificationId,
+  }) async {
+    try {
+      final registration = await _ensureServiceWorker();
+      await registration
+          .showNotification(
+            title,
+            web.NotificationOptions(
+              body: body,
+              tag: 'dearme-letter-$notificationId',
+              renotify: true,
+              icon: Uri.base.resolve('icons/Icon-192.png').toString(),
+            ),
+          )
+          .toDart;
+    } on Object catch (error, stackTrace) {
+      developer.log(
+        'Could not show an in-page web notification.',
+        name: 'dearme.notifications',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<void> cancelAllScheduled() async {
+    _cancelLocalTimers();
     final token = _deviceToken;
     if (!_apiConfigured || token == null || !_isSupported) {
       return;
@@ -219,8 +307,10 @@ class WebPushNotificationService implements NotificationService {
     required String body,
     required String channelName,
     required String channelDescription,
+    required String localeCode,
   }) async {
-    if (!_isSupported) {
+    _localeCode = localeCode;
+    if (!_canShowNotifications) {
       return false;
     }
     if (!(await permissionStatus()).isGranted) {
@@ -305,6 +395,7 @@ class WebPushNotificationService implements NotificationService {
 
   @override
   Future<void> dispose() async {
+    _cancelLocalTimers();
     _client.close();
   }
 

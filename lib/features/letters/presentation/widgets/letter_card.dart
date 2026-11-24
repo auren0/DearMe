@@ -31,13 +31,13 @@ class LetterCard extends StatelessWidget {
     final locale = l10n.localeName;
 
     final (icon, accentColor) = switch (status) {
-      LetterStatus.sealed => (FluentIcons.line.lock_closed, scheme.secondary),
-      LetterStatus.ready => (FluentIcons.line.open, scheme.primary),
+      LetterStatus.sealed => (FluentIcons.line.clock, scheme.secondary),
+      LetterStatus.ready => (FluentIcons.line.mail, scheme.primary),
       LetterStatus.opened => (
         FluentIcons.line.mail_read,
         scheme.onSurfaceVariant,
       ),
-      LetterStatus.draft => (FluentIcons.line.edit, scheme.tertiary),
+      LetterStatus.draft => (FluentIcons.line.mail_edit, scheme.tertiary),
     };
 
     final secondaryLine = switch (status) {
@@ -132,6 +132,10 @@ class LetterCard extends StatelessWidget {
                   Icon(
                     status == LetterStatus.opened
                         ? FluentIcons.line.mail_read
+                        : status == LetterStatus.ready
+                        ? FluentIcons.line.mail
+                        : status == LetterStatus.draft
+                        ? FluentIcons.line.mail_edit
                         : FluentIcons.line.clock,
                     size: 14,
                     color: scheme.onSurfaceVariant,

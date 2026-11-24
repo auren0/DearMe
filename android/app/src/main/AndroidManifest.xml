@@ -10,6 +10,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round">
+        <!-- MainActivity is the only entry point for notification taps. It is
+             launched singleTop so a pending editor is not recreated. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

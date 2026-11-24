@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/models/app_font_option.dart';
 import '../core/models/app_theme_option.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'app_keys.dart';
@@ -23,6 +24,8 @@ class DearMeApp extends ConsumerStatefulWidget {
 class _DearMeAppState extends ConsumerState<DearMeApp> {
   late final GoRouter _router;
   AppLifecycleListener? _lifecycleListener;
+  AppFontOption? _lastFont;
+  AppThemeOption? _lastTheme;
 
   @override
   void initState() {
@@ -84,8 +87,19 @@ class _DearMeAppState extends ConsumerState<DearMeApp> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsControllerProvider);
-    final theme = AppTheme.of(settings.theme);
+    final theme = AppTheme.of(settings.theme, font: settings.font);
     final isLight = settings.theme == AppThemeOption.light;
+
+    // A font change must be immediate. Theme colours still animate smoothly,
+    // but interpolating a TextTheme would keep the old family for half of the
+    // animation, so a pure font change skips the transition.
+    final fontChanged = _lastFont != null && _lastFont != settings.font;
+    final themeChanged = _lastTheme != null && _lastTheme != settings.theme;
+    _lastFont = settings.font;
+    _lastTheme = settings.theme;
+    final themeAnimationDuration = fontChanged && !themeChanged
+        ? Duration.zero
+        : const Duration(milliseconds: 420);
 
     return MaterialApp.router(
       title: 'DearMe',
@@ -94,7 +108,7 @@ class _DearMeAppState extends ConsumerState<DearMeApp> {
       theme: theme,
       darkTheme: theme,
       themeMode: isLight ? ThemeMode.light : ThemeMode.dark,
-      themeAnimationDuration: const Duration(milliseconds: 420),
+      themeAnimationDuration: themeAnimationDuration,
       themeAnimationCurve: Curves.easeOutCubic,
       locale: settings.locale.locale,
       supportedLocales: AppLocalizations.supportedLocales,

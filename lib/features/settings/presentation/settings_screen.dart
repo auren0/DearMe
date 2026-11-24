@@ -1,17 +1,22 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:fluent_icons_kit/fluent_icons_kit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/l10n_extension.dart';
+import '../../../app/notification_retry.dart';
 import '../../../app/providers.dart';
 import '../../../app/snackbar.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../core/models/app_font_option.dart';
 import '../../../core/models/app_locale_option.dart';
 import '../../../core/models/app_theme_option.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/utils/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../shared/widgets/grouped_settings_tile.dart';
 import '../../letters/data/letter_transfer_service.dart';
 import '../../../shared/widgets/app_background.dart';
 import '../../../shared/widgets/content_width.dart';
@@ -63,14 +68,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return;
       }
       if (error != null) {
-        showAppSnackBar(
-          context.l10n.errorNotificationSchedule,
-          isWarning: true,
-        );
+        showNotificationScheduleError(context, ref, error: error);
       }
     } on Object {
       if (mounted) {
         showAppSnackBar(context.l10n.settingsSaveError, isError: true);
+      }
+    }
+  }
+
+  Future<void> _setFont(AppFontOption option) async {
+    final current = ref.read(settingsControllerProvider).font;
+    if (current == option) {
+      return;
+    }
+    try {
+      await ref.read(settingsControllerProvider.notifier).setFont(option);
+    } on Object {
+      if (mounted) {
+        showAppSnackBar(context.l10n.settingsSaveError, isError: true);
+      }
+    }
+  }
+
+  Future<void> _retryScheduling() async {
+    if (_busy) {
+      return;
+    }
+    setState(() => _busy = true);
+    try {
+      await retryNotificationSchedules(
+        ProviderScope.containerOf(context, listen: false),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _busy = false);
       }
     }
   }
@@ -80,9 +112,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await ref
           .read(settingsControllerProvider.notifier)
           .setNotificationPermissionRequested(true);
-    } on Object {
+    } on Object catch (error, stackTrace) {
       // The permission prompt already happened; failing to remember that fact
       // must not block the actual notification flow.
+      developer.log(
+        'Could not persist the notification-permission flag.',
+        name: 'dearme.settings',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -154,10 +192,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return;
       }
       if (error != null) {
-        showAppSnackBar(
-          context.l10n.errorNotificationSchedule,
-          isWarning: true,
-        );
+        showNotificationScheduleError(context, ref, error: error);
       }
     } on Object {
       if (mounted) {
@@ -186,7 +221,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (permission.isGranted) {
         final settings = ref.read(settingsControllerProvider);
         if (settings.notificationsEnabled) {
-          await service.synchronizeSchedules();
+          final error = await service.synchronizeSchedules();
+          if (error != null && mounted) {
+            showNotificationScheduleError(context, ref, error: error);
+          }
         }
       } else {
         showAppSnackBar(
@@ -377,7 +415,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       showAppSnackBar(l10n.dataDeleted);
     } on Object {
       if (mounted) {
-        showAppSnackBar(l10n.storageWriteError, isError: true);
+        showAppSnackBar(l10n.deleteAllError, isError: true);
       }
     } finally {
       if (mounted) {
@@ -474,29 +512,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
-                                  final columns = constraints.maxWidth >= 620
-                                      ? 3
-                                      : 1;
                                   const spacing = 12.0;
-                                  final width =
-                                      (constraints.maxWidth -
-                                          spacing * (columns - 1)) /
-                                      columns;
-                                  return Wrap(
-                                    spacing: spacing,
-                                    runSpacing: spacing,
-                                    children: <Widget>[
-                                      for (final option
-                                          in AppThemeOption.values)
-                                        SizedBox(
-                                          width: width,
-                                          child: _ThemeChoice(
-                                            option: option,
-                                            selected: settings.theme == option,
-                                            onTap: () => _setTheme(option),
-                                          ),
+                                  final cards = <Widget>[
+                                    for (final option in AppThemeOption.values)
+                                      _ThemeChoice(
+                                        key: ValueKey<String>(
+                                          'theme-${option.storageKey}',
                                         ),
-                                    ],
+                                        option: option,
+                                        font: settings.font,
+                                        selected: settings.theme == option,
+                                        onTap: () => _setTheme(option),
+                                      ),
+                                  ];
+                                  if (constraints.maxWidth < 620) {
+                                    return Column(
+                                      children: <Widget>[
+                                        for (
+                                          var index = 0;
+                                          index < cards.length;
+                                          index++
+                                        ) ...<Widget>[
+                                          cards[index],
+                                          if (index < cards.length - 1)
+                                            const SizedBox(height: spacing),
+                                        ],
+                                      ],
+                                    );
+                                  }
+                                  return IntrinsicHeight(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: <Widget>[
+                                        for (
+                                          var index = 0;
+                                          index < cards.length;
+                                          index++
+                                        ) ...<Widget>[
+                                          if (index > 0)
+                                            const SizedBox(width: spacing),
+                                          Expanded(child: cards[index]),
+                                        ],
+                                      ],
+                                    ),
                                   );
                                 },
                               ),
@@ -508,14 +567,86 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           title: l10n.settingsLanguage,
                           icon: FluentIcons.line.translate,
                           children: <Widget>[
-                            for (final option in AppLocaleOption.values)
-                              _ChoiceTile(
-                                title: option == AppLocaleOption.russian
-                                    ? l10n.languageRu
-                                    : l10n.languageEn,
-                                selected: settings.locale == option,
-                                onTap: () => _setLocale(option),
-                              ),
+                            GroupedSettingsGroup(
+                              children: <Widget>[
+                                for (final option in AppLocaleOption.values)
+                                  Semantics(
+                                    selected: settings.locale == option,
+                                    button: true,
+                                    child: GroupedSettingsTile(
+                                      title: option == AppLocaleOption.russian
+                                          ? l10n.languageRu
+                                          : l10n.languageEn,
+                                      leading: _SettingsIcon(
+                                        icon: FluentIcons.line.globe,
+                                        color: settings.locale == option
+                                            ? Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                            : Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                      ),
+                                      trailing: settings.locale == option
+                                          ? Icon(
+                                              FluentIcons.line.checkmark,
+                                              size: 17,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            )
+                                          : null,
+                                      onTap: () => _setLocale(option),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _SectionCard(
+                          title: l10n.settingsFont,
+                          icon: FluentIcons.line.text_font,
+                          children: <Widget>[
+                            GroupedSettingsGroup(
+                              children: <Widget>[
+                                for (final option in AppFontOption.values)
+                                  Semantics(
+                                    selected: settings.font == option,
+                                    button: true,
+                                    label: l10n.a11yFontSelected(
+                                      _fontLabel(option, l10n),
+                                    ),
+                                    child: GroupedSettingsTile(
+                                      title: _fontLabel(option, l10n),
+                                      subtitle: _fontDescription(option, l10n),
+                                      titleStyle: TextStyle(
+                                        fontFamily: option.family,
+                                      ),
+                                      leading: _SettingsIcon(
+                                        icon: FluentIcons.line.text_font,
+                                        color: settings.font == option
+                                            ? Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                            : Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                      ),
+                                      trailing: settings.font == option
+                                          ? Icon(
+                                              FluentIcons.line.checkmark_circle,
+                                              size: 18,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            )
+                                          : null,
+                                      onTap: () => _setFont(option),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -523,73 +654,93 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           title: l10n.settingsNotifications,
                           icon: FluentIcons.line.alert,
                           children: <Widget>[
-                            SwitchListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 4,
-                              ),
-                              title: Text(l10n.settingsNotificationsEnabled),
-                              subtitle: Text(
-                                l10n.settingsNotificationsDescription,
-                              ),
-                              value: settings.notificationsEnabled,
-                              onChanged: _busy ? null : _toggleNotifications,
-                            ),
-                            const Divider(),
-                            _SettingsTile(
-                              icon: FluentIcons.line.shield,
-                              title: l10n.notificationPermissionStatus,
-                              subtitle: _permissionLabel(
-                                permissionAsync.value,
-                                l10n,
-                              ),
-                              trailing: IconButton(
-                                tooltip: l10n.refresh,
-                                onPressed: () => ref.invalidate(
-                                  notificationPermissionProvider,
+                            GroupedSettingsGroup(
+                              children: <Widget>[
+                                GroupedSettingsTile(
+                                  title: l10n.settingsNotificationsEnabled,
+                                  subtitle:
+                                      l10n.settingsNotificationsDescription,
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.alert,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                  ),
+                                  trailing: Switch(
+                                    value: settings.notificationsEnabled,
+                                    onChanged: _busy
+                                        ? null
+                                        : _toggleNotifications,
+                                  ),
+                                  onTap: _busy
+                                      ? null
+                                      : () => _toggleNotifications(
+                                          !settings.notificationsEnabled,
+                                        ),
                                 ),
-                                icon: Icon(
-                                  FluentIcons.line.arrow_sync,
-                                  size: 16,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                GroupedSettingsTile(
+                                  title: l10n.notificationPermissionStatus,
+                                  subtitle: _permissionLabel(
+                                    permissionAsync.value,
+                                    l10n,
+                                  ),
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.shield,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  trailing: IconButton(
+                                    tooltip: l10n.refresh,
+                                    onPressed: () => ref.invalidate(
+                                      notificationPermissionProvider,
+                                    ),
+                                    icon: Icon(
+                                      FluentIcons.line.arrow_sync,
+                                      size: 16,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                  onTap:
+                                      !platformInfo.supportsPermissionRequest ||
+                                          _requestingPermission
+                                      ? null
+                                      : _requestPermission,
                                 ),
-                              ),
-                              onTap: _requestingPermission
-                                  ? null
-                                  : _requestPermission,
+                              ],
                             ),
-                            const Divider(),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(
                                 16,
                                 12,
                                 16,
-                                16,
+                                12,
                               ),
                               child: Wrap(
                                 spacing: 10,
                                 runSpacing: 10,
                                 children: <Widget>[
-                                  OutlinedButton.icon(
-                                    onPressed: _requestingPermission
-                                        ? null
-                                        : _requestPermission,
-                                    icon: _requestingPermission
-                                        ? const SizedBox(
-                                            width: 15,
-                                            height: 15,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
+                                  if (platformInfo.supportsPermissionRequest)
+                                    OutlinedButton.icon(
+                                      onPressed: _requestingPermission
+                                          ? null
+                                          : _requestPermission,
+                                      icon: _requestingPermission
+                                          ? const SizedBox(
+                                              width: 15,
+                                              height: 15,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : Icon(
+                                              FluentIcons.line.shield,
+                                              size: 17,
                                             ),
-                                          )
-                                        : Icon(
-                                            FluentIcons.line.shield,
-                                            size: 17,
-                                          ),
-                                    label: Text(l10n.requestPermission),
-                                  ),
+                                      label: Text(l10n.requestPermission),
+                                    ),
                                   OutlinedButton.icon(
                                     onPressed: _sendingTest
                                         ? null
@@ -619,6 +770,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ),
                                 ],
                               ),
+                            ),
+                            GroupedSettingsGroup(
+                              children: <Widget>[
+                                GroupedSettingsTile(
+                                  title: l10n.retryNotificationScheduling,
+                                  subtitle: l10n
+                                      .retryNotificationSchedulingDescription,
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.arrow_sync,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  onTap: _busy ? null : _retryScheduling,
+                                ),
+                              ],
                             ),
                             _PlatformNote(
                               text: _notificationNote(context, platformInfo),
@@ -674,26 +841,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ),
                             ),
                             const Divider(),
-                            _SettingsTile(
-                              icon: FluentIcons.line.arrow_export,
-                              title: l10n.exportData,
-                              subtitle: l10n.exportDescription,
-                              onTap: _busy ? null : _exportLetters,
-                            ),
-                            const Divider(),
-                            _SettingsTile(
-                              icon: FluentIcons.line.arrow_import,
-                              title: l10n.importData,
-                              subtitle: l10n.importDescription,
-                              onTap: _busy ? null : _importLetters,
-                            ),
-                            const Divider(),
-                            _SettingsTile(
-                              icon: FluentIcons.line.delete,
-                              title: l10n.deleteAllData,
-                              subtitle: l10n.deleteAllDescription,
-                              destructive: true,
-                              onTap: _busy ? null : _deleteAll,
+                            GroupedSettingsGroup(
+                              children: <Widget>[
+                                GroupedSettingsTile(
+                                  key: const ValueKey<String>(
+                                    'settings-export-tile',
+                                  ),
+                                  title: l10n.exportData,
+                                  subtitle: l10n.exportDescription,
+                                  // The export row sits directly under the
+                                  // statistics block, so it must not look like
+                                  // the top of a floating group.
+                                  position: GroupedTilePosition.middle,
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.arrow_export,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                  ),
+                                  onTap: _busy ? null : _exportLetters,
+                                ),
+                                GroupedSettingsTile(
+                                  title: l10n.importData,
+                                  subtitle: l10n.importDescription,
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.arrow_import,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                  ),
+                                  onTap: _busy ? null : _importLetters,
+                                ),
+                                GroupedSettingsTile(
+                                  title: l10n.deleteAllData,
+                                  subtitle: l10n.deleteAllDescription,
+                                  destructive: true,
+                                  leading: _SettingsIcon(
+                                    icon: FluentIcons.line.delete,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  onTap: _busy ? null : _deleteAll,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -741,6 +930,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     };
   }
 
+  String _fontLabel(AppFontOption option, AppLocalizations l10n) {
+    return switch (option) {
+      AppFontOption.googleSans => l10n.fontGoogleSans,
+      AppFontOption.shantellSans => l10n.fontShantellSans,
+      AppFontOption.tiny5Duo => l10n.fontTiny5Duo,
+    };
+  }
+
+  String _fontDescription(AppFontOption option, AppLocalizations l10n) {
+    return switch (option) {
+      AppFontOption.googleSans => l10n.fontGoogleSansDescription,
+      AppFontOption.shantellSans => l10n.fontShantellSansDescription,
+      AppFontOption.tiny5Duo => l10n.fontTiny5DuoDescription,
+    };
+  }
+
   String _notificationNote(
     BuildContext context,
     NotificationPlatformInfo info,
@@ -758,7 +963,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return l10n.notificationLimitationsIos;
     }
     if (PlatformInfo.isAndroid) {
-      return l10n.notificationLimitationsAndroid;
+      return '${l10n.notificationLimitationsAndroid}\n'
+          '${l10n.notificationLimitationsAndroidInexact}';
     }
     if (PlatformInfo.isWindows) {
       return l10n.notificationLimitationsWindows;
@@ -821,63 +1027,37 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-class _SettingsTile extends StatelessWidget {
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.trailing,
-    this.onTap,
-    this.destructive = false,
-  });
+class _SettingsIcon extends StatelessWidget {
+  const _SettingsIcon({required this.icon, required this.color});
 
   final IconData icon;
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final VoidCallback? onTap;
-  final bool destructive;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = destructive
-        ? theme.colorScheme.error
-        : theme.colorScheme.primary;
-    return ListTile(
-      onTap: onTap,
-      leading: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, size: 18, color: color),
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
       ),
-      title: Text(title, style: destructive ? TextStyle(color: color) : null),
-      subtitle: subtitle == null ? null : Text(subtitle!),
-      trailing:
-          trailing ??
-          (onTap == null
-              ? null
-              : Icon(
-                  FluentIcons.line.chevron_right,
-                  size: 16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                )),
+      child: Icon(icon, size: 18, color: color),
     );
   }
 }
 
 class _ThemeChoice extends StatelessWidget {
   const _ThemeChoice({
+    super.key,
     required this.option,
+    required this.font,
     required this.selected,
     required this.onTap,
   });
 
   final AppThemeOption option;
+  final AppFontOption font;
   final bool selected;
   final VoidCallback onTap;
 
@@ -885,7 +1065,7 @@ class _ThemeChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    final preview = AppTheme.of(option);
+    final preview = AppTheme.of(option, font: font);
     final scheme = preview.colorScheme;
     final label = switch (option) {
       AppThemeOption.light => l10n.themeLight,
@@ -1005,44 +1185,6 @@ class _ThemeChoice extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ChoiceTile extends StatelessWidget {
-  const _ChoiceTile({
-    required this.title,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Semantics(
-      selected: selected,
-      button: true,
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(
-          FluentIcons.line.globe,
-          color: selected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurfaceVariant,
-        ),
-        title: Text(title),
-        trailing: selected
-            ? Icon(
-                FluentIcons.line.checkmark,
-                size: 17,
-                color: theme.colorScheme.primary,
-              )
-            : null,
       ),
     );
   }
@@ -1268,16 +1410,26 @@ class _AboutSection extends ConsumerWidget {
             ],
           ),
         ),
-        _SettingsTile(
-          icon: FluentIcons.line.shield,
-          title: l10n.aboutPrivacy,
-          subtitle: l10n.aboutPrivacyBody,
-          onTap: onPrivacy,
-        ),
-        _SettingsTile(
-          icon: FluentIcons.line.document,
-          title: l10n.aboutLicenses,
-          onTap: onLicenses,
+        GroupedSettingsGroup(
+          children: <Widget>[
+            GroupedSettingsTile(
+              title: l10n.aboutPrivacy,
+              subtitle: l10n.aboutPrivacyBody,
+              leading: _SettingsIcon(
+                icon: FluentIcons.line.shield,
+                color: theme.colorScheme.primary,
+              ),
+              onTap: onPrivacy,
+            ),
+            GroupedSettingsTile(
+              title: l10n.aboutLicenses,
+              leading: _SettingsIcon(
+                icon: FluentIcons.line.document,
+                color: theme.colorScheme.primary,
+              ),
+              onTap: onLicenses,
+            ),
+          ],
         ),
       ],
     );

@@ -20,6 +20,7 @@ class FakeNotificationService implements NotificationService {
   bool initialized = false;
   int cancelAllCount = 0;
   int synchronizeCount = 0;
+  int requestPermissionCount = 0;
   int testNotificationCount = 0;
   bool testResult = true;
   List<ScheduledLetter> scheduled = <ScheduledLetter>[];
@@ -44,6 +45,7 @@ class FakeNotificationService implements NotificationService {
     supportsNativeScheduling: !isWeb,
     requiresRunningApp: false,
     supportsSystemSettings: !isWeb,
+    supportsPermissionRequest: true,
     supportsWebPush: isWeb,
     webPushConfigured: isWeb,
     platformName: isWeb ? 'web' : 'test',
@@ -53,7 +55,10 @@ class FakeNotificationService implements NotificationService {
   Future<NotificationPermissionStatus> permissionStatus() async => permission;
 
   @override
-  Future<NotificationPermissionStatus> requestPermission() async => permission;
+  Future<NotificationPermissionStatus> requestPermission() async {
+    requestPermissionCount++;
+    return permission;
+  }
 
   @override
   Future<void> synchronize({
@@ -87,8 +92,10 @@ class FakeNotificationService implements NotificationService {
     required String body,
     required String channelName,
     required String channelDescription,
+    required String localeCode,
   }) async {
     testNotificationCount++;
+    lastLocaleCode = localeCode;
     return testResult;
   }
 

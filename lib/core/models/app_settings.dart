@@ -1,3 +1,4 @@
+import 'app_font_option.dart';
 import 'app_locale_option.dart';
 import 'app_theme_option.dart';
 
@@ -10,6 +11,7 @@ class AppSettings {
     required this.theme,
     required this.locale,
     required this.notificationsEnabled,
+    this.font = AppFontOption.googleSans,
     this.lastKnownTimeZone,
     this.notificationPermissionRequested = false,
   });
@@ -18,12 +20,17 @@ class AppSettings {
     : theme = AppThemeOption.dark,
       locale = AppLocaleOption.russian,
       notificationsEnabled = true,
+      font = AppFontOption.googleSans,
       lastKnownTimeZone = null,
       notificationPermissionRequested = false;
 
   final AppThemeOption theme;
   final AppLocaleOption locale;
   final bool notificationsEnabled;
+
+  /// The font applied to the whole application. Defaults to Google Sans.
+  final AppFontOption font;
+
   final String? lastKnownTimeZone;
 
   /// Android can report only "not enabled", not "never asked". This flag lets
@@ -34,6 +41,7 @@ class AppSettings {
     AppThemeOption? theme,
     AppLocaleOption? locale,
     bool? notificationsEnabled,
+    AppFontOption? font,
     Object? lastKnownTimeZone = _unset,
     bool? notificationPermissionRequested,
   }) {
@@ -41,6 +49,7 @@ class AppSettings {
       theme: theme ?? this.theme,
       locale: locale ?? this.locale,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      font: font ?? this.font,
       lastKnownTimeZone: identical(lastKnownTimeZone, _unset)
           ? this.lastKnownTimeZone
           : lastKnownTimeZone as String?,
@@ -58,6 +67,7 @@ class AppSettings {
         other.theme == theme &&
         other.locale == locale &&
         other.notificationsEnabled == notificationsEnabled &&
+        other.font == font &&
         other.lastKnownTimeZone == lastKnownTimeZone &&
         other.notificationPermissionRequested ==
             notificationPermissionRequested;
@@ -68,6 +78,7 @@ class AppSettings {
     theme,
     locale,
     notificationsEnabled,
+    font,
     lastKnownTimeZone,
     notificationPermissionRequested,
   );

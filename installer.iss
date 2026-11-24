@@ -1,31 +1,29 @@
-; DearMe Windows installer (Inno Setup 6.3+)
+; Inno Setup Script for DearMe
+; Production Windows x64 Installer
 ;
-; Build the Windows release first:
+; Build the Windows release bundle first:
 ;   flutter build windows --release
 ;
-; Then compile this file with Inno Setup:
+; Compile the installer with Inno Setup:
 ;   iscc installer.iss
 ;
-; Output:
-;   build\windows\installer\DearMe-<version>-windows-x64-setup.exe
-;
-; Keep MyAppVersion in sync with `version:` in pubspec.yaml. The installer
-; copies the complete Flutter release bundle, including data\ and plugin DLLs.
+; Result:
+;   dist\DearMe-Setup.exe
 
 #define MyAppName "DearMe"
-#define MyAppVersion "1.0.0"
-#define MyAppVersionInfo "1.0.0.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "DearMe"
 #define MyAppExeName "DearMe.exe"
+#define MyAppId "{{657A7471-C795-44B9-B9F9-5CCFA05E8746}"
 #define MyAppAumid "DearMe.App"
 #define MyAppToastClsid "F7D9A3C2-6C1E-4D7A-9F2B-8E4A1C5B7D30"
 #define BuildDir "build\windows\x64\runner\Release"
-#define OutputDir "build\windows\installer"
-#define SetupIcon "windows\runner\resources\app_icon.ico"
+#define OutputDir "dist"
+#define AppIcon "windows\runner\resources\app_icon.ico"
 
 [Setup]
-; Stable identity for upgrades and uninstall. Do not regenerate this GUID.
-AppId={{657A7471-C795-44B9-B9F9-5CCFA05E8746}
+; Persistent application identity for clean upgrades and seamless uninstall
+AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
@@ -34,54 +32,92 @@ AppComments=Letters to your future self
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-DisableWelcomePage=no
-AllowNoIcons=yes
-LicenseFile=
+DisableDirPage=no
+
+; Minimum supported OS: Windows 10 (version 10.0) 64-bit
+MinVersion=10.0
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+
+; Per-user installation by default without requiring administrator privileges,
+; with elevation dialog option if all-users installation is desired
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
+
+; Output executable configuration
 OutputDir={#OutputDir}
-OutputBaseFilename=DearMe-{#MyAppVersion}-windows-x64-setup
-SetupIconFile={#SetupIcon}
+OutputBaseFilename=DearMe-Setup
+SetupIconFile={#AppIcon}
 UninstallDisplayIcon={app}\{#MyAppExeName}
+UninstallDisplayName={#MyAppName}
+
+; Compression: LZMA2 solid compression for minimal distribution size
 Compression=lzma2/max
 SolidCompression=yes
 LZMAUseSeparateProcess=yes
+
+; Visual styling
 WizardStyle=modern
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
-MinVersion=10.0
-PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
+
+; Safe update handling: close running instances via Windows Restart Manager
 CloseApplications=yes
+CloseApplicationsFilter=*.exe,*.dll
 RestartApplications=no
-VersionInfoVersion={#MyAppVersionInfo}
-VersionInfoCompany={#MyAppPublisher}
-VersionInfoDescription=DearMe installer
-VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion={#MyAppVersionInfo}
-VersionInfoCopyright=Copyright (C) 2026 DearMe
-ShowLanguageDialog=auto
+
+; Upgrade preservation: maintain previous user directory, language and settings
+UsePreviousAppDir=yes
+UsePreviousLanguage=yes
+UsePreviousPrivileges=yes
+UsePreviousTasks=yes
 
 [Languages]
+; Russian is default, English is secondary
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[CustomMessages]
+russian.CreateDesktopIcon=Создать ярлык на Рабочем столе
+english.CreateDesktopIcon=Create a desktop shortcut
+russian.AdditionalIcons=Дополнительные значки:
+english.AdditionalIcons=Additional shortcuts:
+russian.LaunchProgram=Запустить DearMe
+english.LaunchProgram=Launch DearMe
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [InstallDelete]
-; Upgrade from the pre-DearMe executable name without leaving a stale copy.
+; Clean up any legacy lowercase executable if updating from older builds
 Type: files; Name: "{app}\dearme.exe"
 
 [Files]
-Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,*.ilk"
-; The app itself creates its database in the user's application-support
-; directory; no writable data is installed into Program Files.
+; Main Flutter runner executable
+Source: "{#BuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+; Dynamic libraries (Flutter engine and plugins)
+Source: "{#BuildDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+; Native assets configuration (if present in build)
+Source: "{#BuildDir}\native_assets.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; Application data, fonts, shaders, and assets
+Source: "{#BuildDir}\data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Note: User database and preferences in %APPDATA% / %LOCALAPPDATA% are strictly untouched
 
 [Icons]
-; The same AppUserModelID is used by WindowsInitializationSettings in
-; lib/core/services/local_notification_service.dart. Matching it here gives
-; unpackaged installations the correct notification identity.
+; Start Menu shortcut with Toast notification registration
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Comment: "Letters to your future self"; AppUserModelID: "{#MyAppAumid}"; AppUserModelToastActivatorCLSID: "{#MyAppToastClsid}"
+; Desktop shortcut (optional task)
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Comment: "Letters to your future self"; Tasks: desktopicon; AppUserModelID: "{#MyAppAumid}"; AppUserModelToastActivatorCLSID: "{#MyAppToastClsid}"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+// Gracefully request running instances of DearMe to close before replacing binaries
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ResultCode: Integer;
+begin
+  Result := '';
+  // taskkill without /F sends WM_CLOSE, allowing the application to close cleanly
+  Exec('taskkill.exe', '/im {#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Sleep(500);
+end;

@@ -25,48 +25,52 @@ class StartupCoordinator {
     final service = _ref.read(letterServiceProvider);
 
     try {
-      await service.initializeNotifications(
-        (payload) {
-          final id = service.letterIdFromPayload(payload);
-          if (id != null) {
-            onOpenLetter(id);
-          }
-        },
-        onSubscriptionChanged: () {
-          // A browser rotated the push subscription. Re-register and replace
-          // the server schedule while the tab is alive.
-          unawaited(service.synchronizeSchedules());
-        },
-      );
-    } on Object catch (error, stackTrace) {
-      developer.log(
-        'Notification initialization failed.',
-        name: 'dearme.notifications',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    await _refreshTimeZone();
-    await service.synchronizeSchedules();
-
-    try {
-      final launchPayload = await service.takeLaunchPayload();
-      final id = service.letterIdFromPayload(launchPayload);
-      if (id != null) {
-        onOpenLetter(id);
+      try {
+        await service.initializeNotifications(
+          (payload) {
+            final id = service.letterIdFromPayload(payload);
+            if (id != null) {
+              onOpenLetter(id);
+            }
+          },
+          onSubscriptionChanged: () {
+            // A browser rotated the push subscription. Re-register and replace
+            // the server schedule while the tab is alive.
+            unawaited(service.synchronizeSchedules());
+          },
+        );
+      } on Object catch (error, stackTrace) {
+        developer.log(
+          'Notification initialization failed. Scheduling will retry on the '
+          'next save, resume or manual reschedule.',
+          name: 'dearme.notifications',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
-    } on Object catch (error, stackTrace) {
-      developer.log(
-        'Could not read a notification launch payload.',
-        name: 'dearme.notifications',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
 
-    _started = true;
-    _starting = false;
+      await _refreshTimeZone();
+      await service.synchronizeSchedules();
+
+      try {
+        final launchPayload = await service.takeLaunchPayload();
+        final id = service.letterIdFromPayload(launchPayload);
+        if (id != null) {
+          onOpenLetter(id);
+        }
+      } on Object catch (error, stackTrace) {
+        developer.log(
+          'Could not read a notification launch payload.',
+          name: 'dearme.notifications',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+
+      _started = true;
+    } finally {
+      _starting = false;
+    }
   }
 
   Future<void> onResume() async {

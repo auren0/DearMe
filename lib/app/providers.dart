@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/database/app_database.dart';
+import '../core/models/app_font_option.dart';
 import '../core/models/app_locale_option.dart';
 import '../core/models/app_settings.dart';
 import '../core/models/app_theme_option.dart';
@@ -191,6 +192,10 @@ class SettingsController extends Notifier<AppSettings> {
     await _persist(state.copyWith(locale: locale));
   }
 
+  Future<void> setFont(AppFontOption font) async {
+    await _persist(state.copyWith(font: font));
+  }
+
   Future<void> setNotificationsEnabled(bool enabled) async {
     await _persist(state.copyWith(notificationsEnabled: enabled));
   }
@@ -305,6 +310,11 @@ class LettersController extends AsyncNotifier<List<Letter>> {
   }
 
   Future<void> refresh() => _refresh();
+
+  /// Rebuilds the notification schedule without touching persisted letters.
+  /// Returns the technical error, or null on success.
+  Future<Object?> retryNotificationScheduling() =>
+      _service.synchronizeSchedules();
 
   Future<void> _refresh() async {
     final letters = await _repository.getAll();
